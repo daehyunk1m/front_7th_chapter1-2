@@ -42,6 +42,22 @@
 - [ ] 커밋별 올바르게 단계에 대한 작업
 - [ ] AI 도구 활용을 개선하기 위해 노력한 점 PR에 작성
 
++10-28
+CLAUDE.md나
+Test-guide-for-agent.md 등
+에이전트가 수행하면서 참고할 수 있는 가이드 문서를 추가하고 업데이트
+
++10-29
+클로드를 통해 필요한 에이전트 종류를 전달하고 요구사항을 정리해달라고 요청
+클로드 코드를 통해 에이전트 추가
+
+- feature-designer
+- test-designer
+- test-writer
+- code-writer
+- refactoring-expert
+- orchestrator
+
 ### 기본 과제(Hard)
 
 - [ ] Agent 구현 명세 문서 또는 코드
