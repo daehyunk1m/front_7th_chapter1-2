@@ -109,8 +109,7 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
 
       if (!response.ok) {
         if (response.status === 404) {
-          enqueueSnackbar('반복 일정 시리즈를 찾을 수 없습니다.', { variant: 'error' });
-          return;
+          throw new Error('Recurring series not found');
         }
         throw new Error('Failed to update recurring series');
       }
@@ -119,7 +118,7 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
       enqueueSnackbar('반복 일정 시리즈가 수정되었습니다.', { variant: 'success' });
     } catch (error) {
       console.error('Error updating recurring series:', error);
-      enqueueSnackbar('반복 일정 수정 실패', { variant: 'error' });
+      throw error;
     }
   };
 
