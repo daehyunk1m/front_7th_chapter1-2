@@ -1,20 +1,23 @@
 {
-  "session_id": "",
-  "feature_name": "",
-  "branch_name": "",
+  "session_id": "2025-10-30_repeat-event",
+  "feature_name": "반복 일정 기능 추가",
+  "branch_name": "feat/repeat-event",
   "current_phase": 0,
-  "phase_status": "pending",
-  "started_at": "",
-  "updated_at": "",
+  "phase_status": "completed",
+  "started_at": "2025-10-30T09:00:00Z",
+  "updated_at": "2025-10-30T10:00:00Z",
   "phases": {
     "0": {
       "name": "Planning",
-      "status": "pending",
+      "status": "completed",
       "agent": "orchestrator",
-      "started_at": null,
-      "completed_at": null,
-      "git_tag": null,
-      "artifacts": []
+      "started_at": "2025-10-30T09:00:00Z",
+      "completed_at": "2025-10-30T10:00:00Z",
+      "git_tag": "phase-0-repeat-event",
+      "artifacts": [
+        ".claude/agent-docs/orchestrator/logs/2025-10-30_repeat-event-plan.md",
+        ".claude/agent-docs/orchestrator/state/current-state.json"
+      ]
     },
     "1": {
       "name": "Feature Design",
