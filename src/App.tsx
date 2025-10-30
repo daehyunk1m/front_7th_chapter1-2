@@ -196,10 +196,32 @@ function App() {
     setSelectedRecurringEvent(null);
   };
 
-  const handleRecurringSeriesDelete = async () => {
-    if (!selectedRecurringEvent?.repeat.id) return;
+  const handleDeleteSingleOccurrence = async () => {
+    if (!selectedRecurringEvent) {
+      enqueueSnackbar('선택된 일정이 없습니다.', { variant: 'error' });
+      setIsRecurringDeleteDialogOpen(false);
+      return;
+    }
+
+    await deleteEvent(selectedRecurringEvent.id);
+    setIsRecurringDeleteDialogOpen(false);
+    setSelectedRecurringEvent(null);
+  };
+
+  const handleDeleteEntireSeries = async () => {
+    if (!selectedRecurringEvent?.repeat.id) {
+      enqueueSnackbar('반복 일정 시리즈를 찾을 수 없습니다.', { variant: 'error' });
+      setIsRecurringDeleteDialogOpen(false);
+      setSelectedRecurringEvent(null);
+      return;
+    }
 
     await deleteRecurringSeries(selectedRecurringEvent.repeat.id);
+    setIsRecurringDeleteDialogOpen(false);
+    setSelectedRecurringEvent(null);
+  };
+
+  const handleCloseDeleteDialog = () => {
     setIsRecurringDeleteDialogOpen(false);
     setSelectedRecurringEvent(null);
   };
@@ -833,19 +855,38 @@ function App() {
 
       <Dialog
         open={isRecurringDeleteDialogOpen}
-        onClose={() => setIsRecurringDeleteDialogOpen(false)}
+        onClose={handleCloseDeleteDialog}
+        aria-labelledby="recurring-delete-dialog-title"
+        data-testid="recurring-delete-dialog"
+        TransitionProps={{ timeout: 0 }}
       >
-        <DialogTitle>반복 일정 삭제</DialogTitle>
+        <DialogTitle id="recurring-delete-dialog-title">반복 일정 삭제</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            이 반복 시리즈의 모든 일정을 삭제하시겠습니까?
-            <br />이 작업은 되돌릴 수 없습니다.
+            해당 일정만 삭제하시겠어요?
+            <br />
+            "예"를 선택하면 이 일정만 삭제됩니다.
+            <br />
+            "아니오"를 선택하면 반복 시리즈 전체가 삭제됩니다.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsRecurringDeleteDialogOpen(false)}>취소</Button>
-          <Button onClick={handleRecurringSeriesDelete} color="error">
-            전체 삭제
+          <Button onClick={handleCloseDeleteDialog} data-testid="cancel-delete-button">
+            취소
+          </Button>
+          <Button
+            onClick={handleDeleteSingleOccurrence}
+            color="primary"
+            data-testid="delete-single-button"
+          >
+            예
+          </Button>
+          <Button
+            onClick={handleDeleteEntireSeries}
+            color="error"
+            data-testid="delete-series-button"
+          >
+            아니오
           </Button>
         </DialogActions>
       </Dialog>
