@@ -237,6 +237,18 @@ Orchestrator는 **Task tool**을 사용하여 다른 에이전트를 호출합�
 
 ## 📊 상태 관리 (current-state.json)
 
+### ⚠️ 중요: 상태 파일 업데이트 규칙
+
+**필수 업데이트 시점**:
+1. ✅ **Phase 0 시작 시 (즉시)** - 새 세션 정보로 초기화
+2. ✅ **각 Phase 시작 시** - phase_status를 "in_progress"로 변경
+3. ✅ **각 Phase 완료 시** - 산출물 경로 기록 및 "completed"로 변경
+4. ✅ **Phase 실패 시** - 에러 정보 및 retry_count 기록
+
+**업데이트 도구**: Write tool 사용 (Edit tool 아님)
+
+---
+
 ### 상태 파일 구조
 
 **경로**: `.claude/agent-docs/orchestrator/state/current-state.json`
@@ -806,50 +818,140 @@ type Agent = (handoff: HandoffDoc) => Artifact;
 
 **수행 작업**:
 
-1. 요구사항 분석
-2. 영향받는 컴포넌트 식별
-3. 6단계 계획 수립
-4. Work Plan 작성
-5. **Feature 브랜치 생성**
+1. ⚠️ **Feature 브랜치 생성 (필수, 최우선)**
+2. current-state.json 초기화
+3. 요구사항 분석
+4. 영향받는 컴포넌트 식별
+5. 6단계 계획 수립
+6. Work Plan 작성
 
-**Git 워크플로우**:
+---
+
+#### ⚠️ 1단계: Feature 브랜치 생성 (필수)
+
+**Git 워크플로우** (Bash tool 사용):
 
 ```bash
 # 1. Feature slug 생성 (요구사항 기반)
-# 예: "반복 일정 기능 추가" → "repeat-event"
+# 예: "반복 일정 삭제" → "recurring-delete"
 
-# 2. Feature 브랜치 생성
+# 2. Feature 브랜치 생성 (main에서 시작)
 git checkout -b feat/[feature-slug]
 
 # 예시:
-git checkout -b feat/repeat-event
+git checkout -b feat/recurring-delete
+
+# 3. 브랜치 생성 확인
+git branch
+# 예상 출력: * feat/recurring-delete
 ```
+
+**브랜치 네이밍 규칙**:
+- 형식: `feat/[feature-slug]`
+- feature-slug: 소문자 + 하이픈 구분 (kebab-case)
+- 예시:
+  - "반복 일정 추가" → `feat/repeat-event`
+  - "반복 일정 수정" → `feat/recurring-edit`
+  - "반복 일정 삭제" → `feat/recurring-delete`
+  - "알림 기능 추가" → `feat/notification`
+
+---
+
+#### 2단계: current-state.json 초기화 (필수)
+
+**Write tool 사용**:
+
+```json
+{
+  "session_id": "YYYY-MM-DD_[feature-slug]",
+  "feature_name": "[한글 기능명]",
+  "branch_name": "feat/[feature-slug]",
+  "current_phase": 0,
+  "phase_status": "in_progress",
+  "phases": {
+    "0": {
+      "name": "Planning",
+      "status": "in_progress",
+      "agent": "orchestrator",
+      "started_at": "[현재 ISO 타임스탬프]",
+      "artifacts": []
+    },
+    "1": { "name": "Feature Design", "status": "pending", "agent": "feature-designer" },
+    "2": { "name": "Test Design", "status": "pending", "agent": "test-designer" },
+    "3": { "name": "RED - Test Writing", "status": "pending", "agent": "test-writer" },
+    "4": { "name": "GREEN - Implementation", "status": "pending", "agent": "code-writer" },
+    "5": { "name": "REFACTOR", "status": "pending", "agent": "refactoring-expert" },
+    "6": { "name": "VALIDATE", "status": "pending", "agent": "orchestrator" }
+  },
+  "git": {
+    "base_branch": "main",
+    "feature_branch": "feat/[feature-slug]",
+    "tags": []
+  },
+  "metadata": {
+    "created_at": "[현재 ISO 타임스탬프]",
+    "last_updated": "[현재 ISO 타임스탬프]"
+  }
+}
+```
+
+**경로**: `.claude/agent-docs/orchestrator/state/current-state.json`
+
+---
+
+#### ⚠️ Phase 0 진행 전 필수 검증
+
+**다음 체크리스트를 확인한 후 요구사항 분석 및 Work Plan 작성을 시작하세요**:
+
+- [ ] ✅ Feature 브랜치가 생성되었는가? (`git branch` 확인)
+- [ ] ✅ 현재 작업 브랜치가 `feat/[feature-slug]`인가? (main 아님)
+- [ ] ✅ current-state.json이 생성/업데이트되었는가?
+- [ ] ✅ current-state.json의 `branch_name` 필드가 올바른가?
+- [ ] ✅ current-state.json의 `session_id`가 `YYYY-MM-DD_[feature-slug]` 형식인가?
+
+**검증 실패 시**:
+- ❌ 브랜치 생성 없이 main에서 작업하지 말 것
+- ❌ current-state.json 업데이트 없이 다음 단계로 진행하지 말 것
+- ⚠️ 검증 실패 시 즉시 브랜치 생성 및 상태 파일 초기화 수행
+
+---
 
 **산출물**:
 
 ```
 경로: .claude/agent-docs/orchestrator/logs/YYYY-MM-DD_[task]-plan.md
 형식: contract.md의 Work Plan 템플릿 참조
-Git: feat/[feature-slug] 브랜치 생성됨
+Git: feat/[feature-slug] 브랜치 생성 및 전환됨
+State: current-state.json 초기화됨
 ```
 
 **Phase 0 완료 후**:
 
 ```bash
-# 1. 모든 산출물 커밋
+# ⚠️ 1. 브랜치 확인 (필수)
+git branch
+# 예상 출력: * feat/[feature-slug]
+# ❌ main 브랜치라면 즉시 중단하고 브랜치 생성 단계로 돌아갈 것
+
+# 2. 모든 산출물 커밋
 git add .claude/agent-docs/orchestrator/logs/
 git add .claude/agent-docs/orchestrator/state/
-git commit -m "Phase-0: [한글 기능 설명]
+git commit -m "Phase-0: [한글 기능 설명] Planning 완료
 
 - 6단계 TDD 파이프라인 수립
+- Feature 브랜치 생성: feat/[feature-slug]
 - [구체적인 계획 내용]
 - 산출물: logs/YYYY-MM-DD_[task]-plan.md, state/current-state.json"
 
-# 2. Phase 태그 생성
+# 3. Phase 태그 생성
 git tag phase-0-[feature-slug]
 
 # 예시:
-git tag phase-0-repeat-event
+git tag phase-0-recurring-delete
+
+# 4. 커밋 및 태그 확인
+git log --oneline --decorate -1
+# 예상 출력: abc1234 (HEAD -> feat/[feature-slug], tag: phase-0-[feature-slug]) Phase-0: ...
 ```
 
 **다음 단계**: handoff/phase1.md 생성
@@ -1137,45 +1239,102 @@ pnpm dev               # 수동 테스트용
 **Phase 6 완료 후 Git 워크플로우**:
 
 ```bash
-# 1. 최종 보고서 커밋
+# ⚠️ 1. 현재 브랜치 확인 (필수)
+git branch
+# 예상 출력: * feat/[feature-slug]
+# ❌ main 브랜치가 아니어야 함
+
+# 2. 최종 보고서 커밋
 git add .claude/agent-docs/orchestrator/logs/
-git commit -m "Phase-6: [한글 기능 설명] 최종 검증 완료
+git commit -m "Phase-6: [한글 기능 설명] VALIDATE 단계 완료
 
 - 전체 테스트 통과율: 100%
 - 테스트 커버리지: [%]
 - TypeScript/ESLint 검사 통과
 - 산출물: logs/YYYY-MM-DD_[task]-final-report.md"
 
-# 2. Feature 완성 태그 생성
-git tag feature/[feature-slug]-v1.0.0
+# 3. Phase 태그 생성
+git tag phase-6-[feature-slug]
+
+# 예시:
+git tag phase-6-recurring-delete
 ```
 
-**사용자에게 Main 브랜치 머지 옵션 제안**:
+---
+
+**⚠️ Phase 6 완료 후 반드시 사용자에게 Main 브랜치 머지 옵션 제안**:
 
 ```text
 ✅ 모든 Phase 완료!
 
+Feature 브랜치: feat/[feature-slug]
+완료된 Phase: 0~6 (모든 태그 생성 완료)
+
 다음 중 선택하세요:
 
-1. [추천] main 브랜치에 머지
-   → git checkout main && git merge --no-ff feat/[feature-slug]
+1. ⭐ [추천] main 브랜치에 머지
+   - 명령어: git checkout main && git merge --no-ff feat/[feature-slug]
+   - --no-ff 플래그로 머지 커밋 생성
+   - 브랜치 히스토리 유지
 
 2. PR 생성 (팀 리뷰 필요 시)
-   → gh pr create --base main --head feat/[feature-slug]
+   - 명령어: gh pr create --base main --head feat/[feature-slug]
 
 3. 추가 작업 계속 (브랜치 유지)
+   - feat/[feature-slug] 브랜치에서 계속 작업
 ```
 
-**Main 머지 시 커밋 메시지 예시**:
+**Main 머지 시 실행할 전체 워크플로우**:
 
 ```bash
+# 1. main 브랜치로 전환
 git checkout main
-git merge --no-ff feat/repeat-event \
-  -m "Feat: 반복 일정 기능 추가
 
-- 매일/매주/매월/매년 반복 유형 지원
-- RepeatInfo 타입 활성화 및 UI 통합
-- 완료된 Phase: 0~6"
+# 2. main 브랜치 최신화 (필요 시)
+git pull origin main
+
+# 3. Feature 브랜치 머지 (--no-ff 필수)
+git merge --no-ff feat/[feature-slug] -m "Merge feat/[feature-slug] into main
+
+[한글 기능 설명]
+
+- [주요 기능 1]
+- [주요 기능 2]
+- [주요 기능 3]
+- 완료된 Phase: 0~6 (Planning → Design → Test Design → RED → GREEN → REFACTOR → VALIDATE)"
+
+# 예시:
+git merge --no-ff feat/recurring-delete -m "Merge feat/recurring-delete into main
+
+반복 일정 삭제 기능 추가
+
+- 단일 일정 삭제 지원
+- 반복 시리즈 전체 삭제 지원
+- 사용자 확인 다이얼로그 구현
+- 완료된 Phase: 0~6 (Planning → Design → Test Design → RED → GREEN → REFACTOR → VALIDATE)"
+
+# 4. 머지 확인
+git log --oneline --graph --decorate -5
+# 예상 출력: 머지 커밋과 함께 feat/[feature-slug] 브랜치 히스토리 표시
+
+# 5. (선택) Feature 브랜치 삭제
+git branch -d feat/[feature-slug]
+```
+
+**머지 완료 후 사용자에게 보고**:
+
+```text
+✅ Feature 브랜치 머지 완료!
+
+머지 내역:
+- Feature 브랜치: feat/[feature-slug]
+- Main 브랜치: main
+- 머지 커밋: [commit-hash]
+- Phase 태그: phase-0-[feature-slug] ~ phase-6-[feature-slug]
+
+다음 단계:
+- git push origin main (원격 저장소에 푸시)
+- 또는 추가 기능 개발 시작
 ```
 
 ---
@@ -1483,8 +1642,14 @@ orchestrator/
 
 ---
 
-**마지막 업데이트**: 2025-10-30
-**버전**: 2.1.1 (검증 명령어 개선)
+**마지막 업데이트**: 2025-10-31
+**버전**: 2.2.0 (Git 브랜치 전략 강화)
+
+**주요 변경사항**:
+- Phase 0에서 Feature 브랜치 생성을 최우선 필수 작업으로 재구조화
+- current-state.json 업데이트 규칙 명확화 및 강제성 강화
+- 브랜치 확인 체크리스트 추가 (Phase 0, Phase 6)
+- Main 브랜치 머지 워크플로우 상세화
 
 **관련 문서**:
 

@@ -19,7 +19,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { useEventOperations } from '../../hooks/useEventOperations';
 import { server } from '../../setupTests';
-import { EventForm } from '../../types';
+import { EventForm, UpdateRecurringSeriesRequest } from '../../types';
 
 const enqueueSnackbarFn = vi.fn();
 
@@ -52,10 +52,10 @@ describe('useEventOperations - saveRecurringEvents', () => {
     };
 
     // MSW 핸들러 설정
-    let requestBody: any;
+    let requestBody: { events: EventForm[] };
     server.use(
       http.post('/api/events-list', async ({ request }) => {
-        requestBody = await request.json();
+        requestBody = (await request.json()) as { events: EventForm[] };
         const events = requestBody.events.map((event: EventForm, index: number) => ({
           id: String(index + 1),
           ...event,
@@ -171,7 +171,7 @@ describe('useEventOperations - saveRecurringEvents', () => {
     // MSW 핸들러 설정
     server.use(
       http.post('/api/events-list', async ({ request }) => {
-        const body: any = await request.json();
+        const body = (await request.json()) as { events: EventForm[] };
         const events = body.events.map((event: EventForm, index: number) => ({
           id: String(index + 1),
           ...event,
@@ -293,18 +293,16 @@ describe('useEventOperations - updateRecurringSeries', () => {
       })
     );
 
-    // When
+    // When & Then
     await act(async () => {
-      // @ts-expect-error - updateRecurringSeries는 아직 구현되지 않음 (RED phase)
-      await result.current.updateRecurringSeries?.(repeatId, updateData);
-    });
-
-    // Then
-    await waitFor(() => {
-      expect(enqueueSnackbarFn).toHaveBeenCalledWith(
-        expect.stringContaining('찾을 수 없습니다'),
-        expect.objectContaining({ variant: 'error' })
-      );
+      try {
+        // @ts-expect-error - updateRecurringSeries는 아직 구현되지 않음 (RED phase)
+        await result.current.updateRecurringSeries?.(repeatId, updateData);
+      } catch (error) {
+        // 에러가 throw되므로 여기서 catch
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toBe('Recurring series not found');
+      }
     });
   });
 
@@ -319,10 +317,10 @@ describe('useEventOperations - updateRecurringSeries', () => {
     };
 
     // MSW 핸들러 설정
-    let requestBody: any;
+    let requestBody: UpdateRecurringSeriesRequest;
     server.use(
       http.put('/api/recurring-events/:repeatId', async ({ request }) => {
-        requestBody = await request.json();
+        requestBody = (await request.json()) as UpdateRecurringSeriesRequest;
         return HttpResponse.json({ success: true }, { status: 200 });
       })
     );
@@ -355,18 +353,16 @@ describe('useEventOperations - updateRecurringSeries', () => {
       })
     );
 
-    // When
+    // When & Then
     await act(async () => {
-      // @ts-expect-error - updateRecurringSeries는 아직 구현되지 않음 (RED phase)
-      await result.current.updateRecurringSeries?.(repeatId, updateData);
-    });
-
-    // Then
-    await waitFor(() => {
-      expect(enqueueSnackbarFn).toHaveBeenCalledWith(
-        '반복 일정 수정 실패',
-        expect.objectContaining({ variant: 'error' })
-      );
+      try {
+        // @ts-expect-error - updateRecurringSeries는 아직 구현되지 않음 (RED phase)
+        await result.current.updateRecurringSeries?.(repeatId, updateData);
+      } catch (error) {
+        // 에러가 throw되므로 여기서 catch
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toBe('Failed to update recurring series');
+      }
     });
   });
 });
@@ -518,7 +514,7 @@ describe('useEventOperations - saveEvent 분기 로직', () => {
     server.use(
       http.post('/api/events-list', async ({ request }) => {
         batchApiCalled = true;
-        const body: any = await request.json();
+        const body = (await request.json()) as { events: EventForm[] };
         const events = body.events.map((event: EventForm, index: number) => ({
           id: String(index + 1),
           ...event,

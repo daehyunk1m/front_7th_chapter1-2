@@ -48,7 +48,7 @@ describe('반복 일정 전체 흐름 - E2E', () => {
     // Step 1: 생성
     server.use(
       http.post('/api/events-list', async ({ request }) => {
-        const body: any = await request.json();
+        const body = (await request.json()) as { events: EventForm[] };
         createdEvents = body.events.map((event: EventForm, index: number) => ({
           id: String(index + 1),
           ...event,
@@ -77,8 +77,8 @@ describe('반복 일정 전체 흐름 - E2E', () => {
 
     // Step 2: 수정 - 제목 변경
     server.use(
-      http.put('/api/recurring-events/:repeatId', async ({ params, request }) => {
-        const updateData: any = await request.json();
+      http.put('/api/recurring-events/:repeatId', async ({ request }) => {
+        const updateData = (await request.json()) as Partial<Event>;
         // 모든 시리즈 이벤트 제목 변경
         createdEvents = createdEvents.map((e) => ({
           ...e,
@@ -107,7 +107,7 @@ describe('반복 일정 전체 흐름 - E2E', () => {
 
     // Step 3: 삭제 - 시리즈 전체 삭제
     server.use(
-      http.delete('/api/recurring-events/:repeatId', ({ params }) => {
+      http.delete('/api/recurring-events/:repeatId', () => {
         // 시리즈 전체 삭제
         createdEvents = [];
         return new HttpResponse(null, { status: 204 });
@@ -150,7 +150,7 @@ describe('반복 일정 전체 흐름 - E2E', () => {
 
     server.use(
       http.post('/api/events-list', async ({ request }) => {
-        const body: any = await request.json();
+        const body = (await request.json()) as { events: EventForm[] };
         createdEvents = body.events.map((event: EventForm, index: number) => ({
           id: String(index + 1),
           ...event,
@@ -200,7 +200,7 @@ describe('반복 일정 전체 흐름 - E2E', () => {
 
     server.use(
       http.post('/api/events-list', async ({ request }) => {
-        const body: any = await request.json();
+        const body = (await request.json()) as { events: EventForm[] };
         createdEvents = body.events.map((event: EventForm, index: number) => ({
           id: String(index + 1),
           ...event,
@@ -252,7 +252,7 @@ describe('반복 일정 전체 흐름 - E2E', () => {
 
     server.use(
       http.post('/api/events-list', async ({ request }) => {
-        const body: any = await request.json();
+        const body = (await request.json()) as { events: EventForm[] };
         createdEvents = body.events.map((event: EventForm, index: number) => ({
           id: String(index + 1),
           ...event,
