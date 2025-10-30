@@ -101,8 +101,14 @@ function App() {
     editEvent,
   } = useEventForm();
 
-  const { events, saveEvent, deleteEvent, updateRecurringSeries, deleteRecurringSeries } =
-    useEventOperations(Boolean(editingEvent), () => setEditingEvent(null));
+  const {
+    events,
+    fetchEvents,
+    saveEvent,
+    deleteEvent,
+    updateRecurringSeries,
+    deleteRecurringSeries,
+  } = useEventOperations(Boolean(editingEvent), () => setEditingEvent(null));
 
   const { notifications, notifiedEvents, setNotifications } = useNotifications(events);
   const { view, setView, currentDate, holidays, navigate } = useCalendarView();
@@ -113,6 +119,7 @@ function App() {
   const [isRecurringEditDialogOpen, setIsRecurringEditDialogOpen] = useState(false);
   const [isRecurringDeleteDialogOpen, setIsRecurringDeleteDialogOpen] = useState(false);
   const [selectedRecurringEvent, setSelectedRecurringEvent] = useState<Event | null>(null);
+  const [isEditingRecurringSeries, setIsEditingRecurringSeries] = useState(false);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -134,17 +141,57 @@ function App() {
     }
   };
 
-  const handleRecurringSeriesUpdate = async () => {
-    if (!selectedRecurringEvent?.repeat.id) return;
+  const handleEditSingleOccurrence = async () => {
+    if (!selectedRecurringEvent) {
+      enqueueSnackbar('선택된 일정이 없습니다.', { variant: 'error' });
+      return;
+    }
 
-    await updateRecurringSeries(selectedRecurringEvent.repeat.id, {
-      title: selectedRecurringEvent.title,
-      description: selectedRecurringEvent.description,
-      location: selectedRecurringEvent.location,
-      category: selectedRecurringEvent.category,
-      notificationTime: selectedRecurringEvent.notificationTime,
-    });
+    try {
+      const updatedEvent: Event = {
+        ...selectedRecurringEvent,
+        repeat: {
+          type: 'none',
+          interval: 1,
+          id: undefined,
+          endDate: undefined,
+        },
+      };
 
+      const response = await fetch(`/api/events/${updatedEvent.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedEvent),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update single event');
+      }
+
+      await fetchEvents();
+      setIsRecurringEditDialogOpen(false);
+      setSelectedRecurringEvent(null);
+
+      enqueueSnackbar('일정이 수정되었습니다.', { variant: 'success' });
+    } catch (error) {
+      console.error('Error updating single occurrence:', error);
+      enqueueSnackbar('일정 수정 실패', { variant: 'error' });
+    }
+  };
+
+  const handleEditAllOccurrences = () => {
+    if (!selectedRecurringEvent) {
+      enqueueSnackbar('선택된 일정이 없습니다.', { variant: 'error' });
+      return;
+    }
+
+    editEvent(selectedRecurringEvent);
+    setIsEditingRecurringSeries(true);
+    setIsRecurringEditDialogOpen(false);
+    setSelectedRecurringEvent(null);
+  };
+
+  const handleCancelDialog = () => {
     setIsRecurringEditDialogOpen(false);
     setSelectedRecurringEvent(null);
   };
@@ -183,6 +230,32 @@ function App() {
         enqueueSnackbar('반복 종료일은 2025-12-31까지만 가능합니다.', { variant: 'error' });
         return;
       }
+    }
+
+    if (editingEvent && isEditingRecurringSeries && editingEvent.repeat.id) {
+      try {
+        await updateRecurringSeries(editingEvent.repeat.id, {
+          title,
+          description,
+          location,
+          category,
+          notificationTime,
+          repeat: {
+            type: repeatType,
+            interval: repeatInterval,
+            endDate: repeatEndDate || undefined,
+          },
+        });
+
+        setIsEditingRecurringSeries(false);
+        resetForm();
+        setEditingEvent(null);
+      } catch (error) {
+        if (error instanceof Error && error.message === 'Recurring series not found') {
+          enqueueSnackbar('반복 일정 시리즈를 찾을 수 없습니다.', { variant: 'error' });
+        }
+      }
+      return;
     }
 
     const eventData: Event | EventForm = {
@@ -487,7 +560,7 @@ function App() {
                   data-testid="repeat-checkbox"
                 />
               }
-              label="반복 일정"
+              label="반복 설정"
             />
           </FormControl>
 
@@ -719,19 +792,41 @@ function App() {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={isRecurringEditDialogOpen} onClose={() => setIsRecurringEditDialogOpen(false)}>
-        <DialogTitle>반복 일정 수정</DialogTitle>
+      <Dialog
+        open={isRecurringEditDialogOpen}
+        onClose={handleCancelDialog}
+        aria-labelledby="recurring-edit-dialog-title"
+        data-testid="recurring-edit-dialog"
+        TransitionProps={{ timeout: 0 }}
+      >
+        <DialogTitle id="recurring-edit-dialog-title">반복 일정 수정</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            이 반복 시리즈의 모든 일정을 수정하시겠습니까?
+            해당 일정만 수정하시겠어요?
             <br />
-            시리즈의 모든 일정에 동일하게 적용됩니다.
+            "예"를 선택하면 이 일정만 단일 일정으로 변경됩니다.
+            <br />
+            "아니오"를 선택하면 반복 시리즈 전체를 수정할 수 있습니다.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsRecurringEditDialogOpen(false)}>취소</Button>
-          <Button onClick={handleRecurringSeriesUpdate} color="primary">
-            전체 수정
+          <Button onClick={handleCancelDialog} data-testid="recurring-edit-cancel-button">
+            취소
+          </Button>
+          <Button
+            onClick={handleEditSingleOccurrence}
+            color="primary"
+            data-testid="recurring-edit-single-button"
+          >
+            예
+          </Button>
+          <Button
+            onClick={handleEditAllOccurrences}
+            color="primary"
+            variant="contained"
+            data-testid="recurring-edit-all-button"
+          >
+            아니오
           </Button>
         </DialogActions>
       </Dialog>

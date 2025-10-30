@@ -49,6 +49,7 @@ import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { SnackbarProvider } from 'notistack';
+import React from 'react';
 
 import App from '../../App';
 import { server } from '../../setupTests';
@@ -91,7 +92,7 @@ const mockRecurringEvents: Event[] = [
   {
     id: '2',
     title: '주간 회의',
-    date: '2025-11-06',
+    date: '2025-10-07',
     startTime: '10:00',
     endTime: '11:00',
     description: '팀 주간 회의',
@@ -108,7 +109,7 @@ const mockRecurringEvents: Event[] = [
   {
     id: '3',
     title: '주간 회의',
-    date: '2025-11-13',
+    date: '2025-10-14',
     startTime: '10:00',
     endTime: '11:00',
     description: '팀 주간 회의',
@@ -125,7 +126,7 @@ const mockRecurringEvents: Event[] = [
   {
     id: '4',
     title: '주간 회의',
-    date: '2025-11-20',
+    date: '2025-10-21',
     startTime: '10:00',
     endTime: '11:00',
     description: '팀 주간 회의',
@@ -203,7 +204,7 @@ describe('반복 일정 수정', () => {
       const { user } = setup(<App />);
       await screen.findByText('일정 로딩 완료!');
 
-      let requestBody: any = null;
+      let requestBody: unknown = null;
       server.use(
         http.put('/api/events/:id', async ({ request }) => {
           requestBody = await request.json();
@@ -260,10 +261,10 @@ describe('반복 일정 수정', () => {
       const { user } = setup(<App />);
       await screen.findByText('일정 로딩 완료!');
 
-      let requestBody: any = null;
+      let requestBody: { title?: string; description?: string } = {};
       server.use(
         http.put('/api/recurring-events/:repeatId', async ({ request }) => {
-          requestBody = await request.json();
+          requestBody = (await request.json()) as { title?: string; description?: string };
           const updatedEvents = mockRecurringEvents
             .filter((e) => e.repeat.id === 'repeat-1')
             .map((e) => ({
@@ -352,16 +353,15 @@ describe('반복 일정 수정', () => {
     });
 
     it('반복 시리즈가 존재하지 않으면 404 에러를 처리해야 함', async () => {
+      expect.hasAssertions();
+
       // Given: 전체 수정 모드로 진입
       const { user } = setup(<App />);
       await screen.findByText('일정 로딩 완료!');
 
       server.use(
         http.put('/api/recurring-events/:repeatId', () => {
-          return HttpResponse.json(
-            { error: 'Recurring series not found' },
-            { status: 404 }
-          );
+          return HttpResponse.json({ error: 'Recurring series not found' }, { status: 404 });
         })
       );
 
@@ -376,7 +376,8 @@ describe('반복 일정 수정', () => {
       await user.click(saveButton);
 
       // Then: 404 에러 메시지 표시
-      await screen.findByText('반복 일정 시리즈를 찾을 수 없습니다.');
+      const errorMessage = await screen.findByText('반복 일정 시리즈를 찾을 수 없습니다.');
+      expect(errorMessage).toBeInTheDocument();
     });
   });
 });
