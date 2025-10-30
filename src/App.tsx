@@ -178,6 +178,11 @@ function App() {
         enqueueSnackbar('반복 종료일은 시작일 이후여야 합니다.', { variant: 'error' });
         return;
       }
+
+      if (repeatEndDate && new Date(repeatEndDate) > new Date('2025-12-31')) {
+        enqueueSnackbar('반복 종료일은 2025-12-31까지만 가능합니다.', { variant: 'error' });
+        return;
+      }
     }
 
     const eventData: Event | EventForm = {
