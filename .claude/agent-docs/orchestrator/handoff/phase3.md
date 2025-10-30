@@ -29,7 +29,7 @@ output_requirements:
     - Test suites with GWT pattern
   format: typescript
   additional:
-    - logs/red-phase-result.md
+    - logs/YYYY-MM-DD_test-writing-log.md
 
 constraints:
   - 테스트는 반드시 실패해야 함 (RED Phase)
@@ -67,7 +67,7 @@ validation_criteria:
 
 ### 출력 산출물
 - `/Users/daehyun/Desktop/hh99_fe_7th/front_7th_chapter1-2/src/__tests__/integration/task.recurring-edit.spec.tsx` 파일 생성
-- `.claude/agent-docs/test-writer/logs/red-phase-result.md` 작성 (테스트 실패 결과 기록)
+- `.claude/agent-docs/test-writer/logs/YYYY-MM-DD_test-writing-log.md` 작성 (테스트 실패 결과 기록)
 
 ---
 

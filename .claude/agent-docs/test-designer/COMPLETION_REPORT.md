@@ -45,7 +45,7 @@
 
 ### 2. 요약 문서 (약 400줄)
 
-**파일**: `logs/TEST_STRATEGY_SUMMARY.md`
+**파일**: `logs/2025-10-30_test-strategy-summary.md`
 
 **내용**:
 - 완성 항목 요약
@@ -176,7 +176,7 @@ it('구체적인 테스트 시나리오', () => {
 | 문서 | 라인 수 | 크기 | 대상 |
 |-----|--------|------|------|
 | `2025-10-30_repeat-event-test-strategy.md` | 1,114 | 32KB | test-writer |
-| `TEST_STRATEGY_SUMMARY.md` | ~400 | 11KB | 프로젝트 리더 |
+| `2025-10-30_test-strategy-summary.md` | ~400 | 11KB | 프로젝트 리더 |
 | `README.md` | ~300 | 6.9KB | 모든 관계자 |
 | `QUICK_START.md` | ~400 | 10KB | test-writer |
 | **총계** | **2,200+** | **60KB** | |
@@ -314,7 +314,7 @@ All files                              |    84   |    86   |    82   |    83   |
 
 ### 문서 제출
 - [x] `logs/2025-10-30_repeat-event-test-strategy.md` (1,114줄)
-- [x] `logs/TEST_STRATEGY_SUMMARY.md` (~400줄)
+- [x] `logs/2025-10-30_test-strategy-summary.md` (~400줄)
 - [x] `README.md` (~300줄)
 - [x] `QUICK_START.md` (~400줄)
 - [x] `COMPLETION_REPORT.md` (이 문서)

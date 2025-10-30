@@ -11,7 +11,7 @@ inputs:
     - ./phase0-plan.md
     - .claude/agent-docs/feature-designer/logs/spec.md
     - .claude/agent-docs/test-designer/logs/test-strategy.md
-    - .claude/agent-docs/test-writer/logs/red-phase-result.md
+    - .claude/agent-docs/test-writer/logs/YYYY-MM-DD_test-writing-log.md
     - /Users/daehyun/Desktop/hh99_fe_7th/front_7th_chapter1-2/src/__tests__/integration/task.recurring-edit.spec.tsx
     - /Users/daehyun/Desktop/hh99_fe_7th/front_7th_chapter1-2/src/App.tsx
 
@@ -31,7 +31,7 @@ output_requirements:
     - editEvent 연동
   format: typescript
   additional:
-    - .claude/agent-docs/code-writer/logs/implementation.md
+    - .claude/agent-docs/code-writer/logs/YYYY-MM-DD_implementation-log.md
 
 constraints:
   - 모든 테스트가 통과해야 함 (GREEN Phase)
@@ -65,13 +65,13 @@ validation_criteria:
 - [계획 문서](./phase0-plan.md)
 - [기능 설계](.claude/agent-docs/feature-designer/logs/spec.md)
 - [테스트 설계](.claude/agent-docs/test-designer/logs/test-strategy.md)
-- [RED Phase 결과](.claude/agent-docs/test-writer/logs/red-phase-result.md)
+- [RED Phase 결과](.claude/agent-docs/test-writer/logs/YYYY-MM-DD_test-writing-log.md)
 - [실패하는 테스트](../src/__tests__/integration/task.recurring-edit.spec.tsx)
 - 현재 구현: `/Users/daehyun/Desktop/hh99_fe_7th/front_7th_chapter1-2/src/App.tsx`
 
 ### 출력 산출물
 - `src/App.tsx` 수정 (RecurringEditDialog 개선 + 핸들러 함수 구현)
-- `.claude/agent-docs/code-writer/logs/implementation.md` 작성 (구현 내용 기록)
+- `.claude/agent-docs/code-writer/logs/YYYY-MM-DD_implementation-log.md` 작성 (구현 내용 기록)
 - 모든 테스트 통과
 
 ---

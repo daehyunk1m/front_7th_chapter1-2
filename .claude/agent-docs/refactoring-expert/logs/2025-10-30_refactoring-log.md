@@ -1,11 +1,12 @@
-# 리팩터링 분석 보고서: 반복 일정 수정 기능
+# Refactoring Log (REFACTOR Phase)
 
-**작성일**: 2025-10-30
-**분석자**: Refactoring Expert Agent
-**대상 기능**: 반복 일정 수정 (단일/전체 수정 선택)
-**현재 상태**: Phase 4 GREEN 단계 완료 (8/8 테스트 통과)
+**작성일**: 2025-10-30  
+**Phase**: 5/6 - REFACTOR (Code Quality)  
+**기능**: 반복 일정 수정 (단일/전체 수정 선택)  
+**이전 상태**: Phase 4 GREEN 완료 (8/8 테스트 통과)
 
 **분석 대상 파일**:
+
 - `/src/App.tsx` (879줄)
 - `/src/hooks/useEventOperations.ts` (182줄)
 - `/src/__tests__/integration/task.recurring-edit.spec.tsx` (384줄)
@@ -32,16 +33,16 @@ Phase 4에서 구현된 코드는 **기능적으로 완벽하게 동작**하며 
 
 ### 주요 지표
 
-| 항목 | 현재 상태 | 개선 목표 |
-|------|----------|----------|
-| 테스트 통과율 | 100% (8/8) | 100% 유지 |
-| App.tsx 줄 수 | 879줄 | 600줄 이하 |
-| 중복 코드 | Week/Month 뷰 2회 | 0회 |
-| MUI 경고 | 약 30개 발생 | 0개 |
-| 매직 문자열 | 15+ | 0 |
-| 함수 최대 길이 | 79줄 | 30줄 이하 |
-| TypeScript 에러 | 0 | 0 유지 |
-| ESLint 에러 | 0 | 0 유지 |
+| 항목            | 현재 상태         | 개선 목표  |
+| --------------- | ----------------- | ---------- |
+| 테스트 통과율   | 100% (8/8)        | 100% 유지  |
+| App.tsx 줄 수   | 879줄             | 600줄 이하 |
+| 중복 코드       | Week/Month 뷰 2회 | 0회        |
+| MUI 경고        | 약 30개 발생      | 0개        |
+| 매직 문자열     | 15+               | 0          |
+| 함수 최대 길이  | 79줄              | 30줄 이하  |
+| TypeScript 에러 | 0                 | 0 유지     |
+| ESLint 에러     | 0                 | 0 유지     |
 
 ---
 
@@ -58,6 +59,7 @@ Phase 4에서 구현된 코드는 **기능적으로 완벽하게 동작**하며 
 **우선순위**: 낮음 (현재 구조 유지 권장)
 
 **현재 코드**: (변경 불필요)
+
 ```typescript
 // 각 다이얼로그가 명확한 목적과 다른 액션을 가지고 있음
 <Dialog open={isOverlapDialogOpen} ...>         // 겹침 경고 + 진행 확인
@@ -80,36 +82,39 @@ Phase 4에서 구현된 코드는 **기능적으로 완벽하게 동작**하며 
 **우선순위**: 중간
 
 **현재 코드**:
+
 ```typescript
-{event.repeat.type !== 'none' && (
-  <Typography>
-    반복: {event.repeat.interval}
-    {event.repeat.type === 'daily' && '일'}
-    {event.repeat.type === 'weekly' && '주'}
-    {event.repeat.type === 'monthly' && '월'}
-    {event.repeat.type === 'yearly' && '년'}
-    마다
-    {event.repeat.endDate && ` (종료: ${event.repeat.endDate})`}
-  </Typography>
-)}
+{
+  event.repeat.type !== 'none' && (
+    <Typography>
+      반복: {event.repeat.interval}
+      {event.repeat.type === 'daily' && '일'}
+      {event.repeat.type === 'weekly' && '주'}
+      {event.repeat.type === 'monthly' && '월'}
+      {event.repeat.type === 'yearly' && '년'}
+      마다
+      {event.repeat.endDate && ` (종료: ${event.repeat.endDate})`}
+    </Typography>
+  );
+}
 ```
 
 **리팩토링된 코드**:
+
 ```typescript
 // src/utils/repeatUtils.ts에 이미 존재하는 함수 활용
 import { formatRepeatInfo } from './utils/repeatUtils';
 
 // App.tsx에서 사용
-{event.repeat.type !== 'none' && (
-  <Typography>
-    반복: {formatRepeatInfo(event.repeat)}
-  </Typography>
-)}
+{
+  event.repeat.type !== 'none' && <Typography>반복: {formatRepeatInfo(event.repeat)}</Typography>;
+}
 ```
 
 **설명**: `formatRepeatInfo` 함수가 이미 존재하나 활용되지 않고 있습니다. 이 함수를 사용하면 코드 중복을 제거하고 일관성을 확보할 수 있습니다.
 
 **테스트 고려사항**:
+
 - 기존 테스트가 텍스트 내용을 검증하지 않으므로 영향 없음
 - formatRepeatInfo의 기존 테스트가 있는지 확인 필요
 
@@ -126,6 +131,7 @@ import { formatRepeatInfo } from './utils/repeatUtils';
 **우선순위**: 낮음 (현재 유지)
 
 **설명**:
+
 - 폼 상태는 useEventForm 훅으로 분리됨
 - API 로직은 useEventOperations 훅으로 분리됨
 - 캘린더 뷰는 renderWeekView/renderMonthView로 함수 분리됨
@@ -144,15 +150,19 @@ import { formatRepeatInfo } from './utils/repeatUtils';
 **우선순위**: 낮음 (성급한 최적화 방지)
 
 **현재 코드**: (변경 보류)
+
 ```typescript
-{filteredEvents.map((event) => (
-  <Box key={event.id} sx={{ border: 1, borderRadius: 2, p: 3, width: '100%' }}>
-    {/* 이벤트 카드 UI */}
-  </Box>
-))}
+{
+  filteredEvents.map((event) => (
+    <Box key={event.id} sx={{ border: 1, borderRadius: 2, p: 3, width: '100%' }}>
+      {/* 이벤트 카드 UI */}
+    </Box>
+  ));
+}
 ```
 
 **설명**:
+
 - 이벤트 목록이 대량이 아니므로 현재 성능은 충분
 - React.memo 적용은 실제 성능 문제가 측정된 후 진행 권장
 - 컴포넌트 분리는 사용자 요청 시 진행
@@ -172,6 +182,7 @@ import { formatRepeatInfo } from './utils/repeatUtils';
 **우선순위**: 높음
 
 **현재 코드**:
+
 ```typescript
 <Select
   id="repeat-type"
@@ -181,14 +192,23 @@ import { formatRepeatInfo } from './utils/repeatUtils';
   aria-label="반복 유형"
   data-testid="repeat-type-select"
 >
-  <MenuItem value="daily" aria-label="매일-option">매일</MenuItem>
-  <MenuItem value="weekly" aria-label="매주-option">매주</MenuItem>
-  <MenuItem value="monthly" aria-label="매월-option">매월</MenuItem>
-  <MenuItem value="yearly" aria-label="매년-option">매년</MenuItem>
+  <MenuItem value="daily" aria-label="매일-option">
+    매일
+  </MenuItem>
+  <MenuItem value="weekly" aria-label="매주-option">
+    매주
+  </MenuItem>
+  <MenuItem value="monthly" aria-label="매월-option">
+    매월
+  </MenuItem>
+  <MenuItem value="yearly" aria-label="매년-option">
+    매년
+  </MenuItem>
 </Select>
 ```
 
 **리팩토링된 코드**:
+
 ```typescript
 <Select
   id="repeat-type"
@@ -198,18 +218,28 @@ import { formatRepeatInfo } from './utils/repeatUtils';
   aria-label="반복 유형"
   data-testid="repeat-type-select"
 >
-  <MenuItem value="daily" aria-label="매일-option">매일</MenuItem>
-  <MenuItem value="weekly" aria-label="매주-option">매주</MenuItem>
-  <MenuItem value="monthly" aria-label="매월-option">매월</MenuItem>
-  <MenuItem value="yearly" aria-label="매년-option">매년</MenuItem>
+  <MenuItem value="daily" aria-label="매일-option">
+    매일
+  </MenuItem>
+  <MenuItem value="weekly" aria-label="매주-option">
+    매주
+  </MenuItem>
+  <MenuItem value="monthly" aria-label="매월-option">
+    매월
+  </MenuItem>
+  <MenuItem value="yearly" aria-label="매년-option">
+    매년
+  </MenuItem>
 </Select>
 ```
 
 **설명**:
+
 - 반복 설정이 활성화된 경우에만 이 Select가 표시되므로, repeatType이 'none'일 경우 'daily'로 기본값 설정
 - 또는 MenuItem에 'none' 옵션 추가 고려 가능
 
 **테스트 고려사항**:
+
 - 기존 테스트는 통과 유지
 - MUI 경고 해결 확인
 
@@ -224,6 +254,7 @@ import { formatRepeatInfo } from './utils/repeatUtils';
 **우선순위**: 중간
 
 **현재 코드**:
+
 ```typescript
 // task.useEventOperations.spec.ts:55
 let actualRequest: any = null;
@@ -233,6 +264,7 @@ let requestBody: any = null;
 ```
 
 **리팩토링된 코드**:
+
 ```typescript
 // 적절한 타입 정의
 interface CreateEventRequest {
@@ -252,10 +284,12 @@ let requestBody: Partial<CreateEventRequest> | null = null;
 ```
 
 **설명**:
+
 - HTTP 요청/응답 타입을 명확히 정의
 - unknown 타입 사용 후 타입 가드 적용도 고려 가능
 
 **테스트 고려사항**:
+
 - ESLint 에러 해결
 - 테스트 동작은 변경 없음
 
@@ -272,6 +306,7 @@ let requestBody: Partial<CreateEventRequest> | null = null;
 **우선순위**: 중간
 
 **현재 코드**:
+
 ```typescript
 enqueueSnackbar('필수 정보를 모두 입력해주세요.', { variant: 'error' });
 enqueueSnackbar('반복 간격은 1 이상이어야 합니다.', { variant: 'error' });
@@ -280,6 +315,7 @@ enqueueSnackbar('반복 종료일은 2025-12-31까지만 가능합니다.', { va
 ```
 
 **리팩토링된 코드**:
+
 ```typescript
 // src/constants/messages.ts (새 파일)
 export const VALIDATION_MESSAGES = {
@@ -304,11 +340,13 @@ enqueueSnackbar(VALIDATION_MESSAGES.REQUIRED_FIELDS_MISSING, { variant: 'error' 
 ```
 
 **설명**:
+
 - 메시지를 한 곳에서 관리하여 일관성 확보
 - i18n 전환 시에도 용이
 - as const로 타입 안전성 확보
 
 **테스트 고려사항**:
+
 - 테스트는 메시지 내용을 검증하므로 import 경로 업데이트 필요
 - 메시지 내용은 동일하게 유지
 
@@ -323,6 +361,7 @@ enqueueSnackbar(VALIDATION_MESSAGES.REQUIRED_FIELDS_MISSING, { variant: 'error' 
 **우선순위**: 높음
 
 **현재 코드**:
+
 ```typescript
 if (repeatEndDate && new Date(repeatEndDate) > new Date('2025-12-31')) {
   enqueueSnackbar('반복 종료일은 2025-12-31까지만 가능합니다.', { variant: 'error' });
@@ -331,6 +370,7 @@ if (repeatEndDate && new Date(repeatEndDate) > new Date('2025-12-31')) {
 ```
 
 **리팩토링된 코드**:
+
 ```typescript
 // src/constants/eventConfig.ts (새 파일)
 export const EVENT_CONFIG = {
@@ -342,16 +382,20 @@ export const EVENT_CONFIG = {
 // 사용
 import { EVENT_CONFIG } from './constants/eventConfig';
 if (repeatEndDate && new Date(repeatEndDate) > new Date(EVENT_CONFIG.REPEAT_END_DATE_MAX)) {
-  enqueueSnackbar(`반복 종료일은 ${EVENT_CONFIG.REPEAT_END_DATE_MAX}까지만 가능합니다.`, { variant: 'error' });
+  enqueueSnackbar(`반복 종료일은 ${EVENT_CONFIG.REPEAT_END_DATE_MAX}까지만 가능합니다.`, {
+    variant: 'error',
+  });
   return;
 }
 ```
 
 **설명**:
+
 - 설정 값을 한 곳에서 관리
 - 메시지에서도 동적으로 참조하여 일관성 유지
 
 **테스트 고려사항**:
+
 - 테스트는 날짜 값을 검증하지 않으므로 영향 없음
 
 ---
@@ -365,6 +409,7 @@ if (repeatEndDate && new Date(repeatEndDate) > new Date(EVENT_CONFIG.REPEAT_END_
 **우선순위**: 중간
 
 **현재 코드**:
+
 ```typescript
 const addOrUpdateEvent = async () => {
   if (!title || !date || !startTime || !endTime) {
@@ -398,6 +443,7 @@ const addOrUpdateEvent = async () => {
 ```
 
 **리팩토링된 코드**:
+
 ```typescript
 // src/utils/eventValidation.ts (새 파일)
 import { VALIDATION_MESSAGES } from '../constants/messages';
@@ -451,7 +497,14 @@ export function validateRepeatConfig(
 import { validateEventForm, validateRepeatConfig } from './utils/eventValidation';
 
 const addOrUpdateEvent = async () => {
-  const formValidation = validateEventForm(title, date, startTime, endTime, startTimeError, endTimeError);
+  const formValidation = validateEventForm(
+    title,
+    date,
+    startTime,
+    endTime,
+    startTimeError,
+    endTimeError
+  );
   if (!formValidation.isValid) {
     enqueueSnackbar(formValidation.error!, { variant: 'error' });
     return;
@@ -470,11 +523,13 @@ const addOrUpdateEvent = async () => {
 ```
 
 **설명**:
+
 - 유효성 검사 로직을 순수 함수로 분리
 - 단위 테스트 작성 용이
 - 다른 곳에서 재사용 가능
 
 **테스트 고려사항**:
+
 - 기존 통합 테스트는 통과 유지
 - 새로운 유틸 함수에 대한 단위 테스트 추가 권장
 
@@ -489,6 +544,7 @@ const addOrUpdateEvent = async () => {
 **우선순위**: 높음
 
 **현재 코드**:
+
 ```typescript
 const handleEditSingleOccurrence = async () => {
   if (!selectedRecurringEvent) {
@@ -530,6 +586,7 @@ const handleEditSingleOccurrence = async () => {
 ```
 
 **리팩토링된 코드**:
+
 ```typescript
 // useEventOperations.ts에 추가
 export const convertToSingleEvent = async (event: Event): Promise<void> => {
@@ -583,11 +640,13 @@ const handleEditSingleOccurrence = async () => {
 ```
 
 **설명**:
+
 - API 로직을 useEventOperations로 이동하여 책임 분리
 - App.tsx는 UI 상태 관리에만 집중
 - 에러 처리 일관성 확보
 
 **테스트 고려사항**:
+
 - 기존 통합 테스트는 통과 유지
 - useEventOperations 단위 테스트 추가 권장
 
@@ -604,6 +663,7 @@ const handleEditSingleOccurrence = async () => {
 **우선순위**: 낮음 (현재 유지)
 
 **설명**:
+
 - useEventForm: 폼 상태 관리 ✅
 - useEventOperations: API 통신 ✅
 - useCalendarView: 달력 뷰 상태 ✅
@@ -624,6 +684,7 @@ const handleEditSingleOccurrence = async () => {
 **우선순위**: 낮음 (과도한 추상화 방지)
 
 **설명**:
+
 - 현재 구조가 충분히 명확하고 유지보수 가능
 - 전략 패턴 적용은 복잡도만 증가시킬 가능성
 
@@ -634,9 +695,11 @@ const handleEditSingleOccurrence = async () => {
 ## 3. 구현 로드맵
 
 ### 단계 1: 타입 안전성 강화 (가장 안전)
+
 **예상 작업량**: 1-2시간
 
 1. RepeatType Select MUI 경고 해결
+
    - App.tsx 라인 574 수정
    - 테스트 실행 확인
 
@@ -652,13 +715,16 @@ const handleEditSingleOccurrence = async () => {
 ---
 
 ### 단계 2: 매직 문자열/넘버 상수화
+
 **예상 작업량**: 2-3시간
 
 1. constants 디렉토리 생성
+
    - `src/constants/messages.ts` 작성
    - `src/constants/eventConfig.ts` 작성
 
 2. App.tsx 리팩터링
+
    - 메시지 상수 import 및 교체
    - 설정 값 상수 import 및 교체
    - 테스트 실행 확인
@@ -673,9 +739,11 @@ const handleEditSingleOccurrence = async () => {
 ---
 
 ### 단계 3: 유효성 검사 로직 분리
+
 **예상 작업량**: 2-3시간
 
 1. eventValidation.ts 유틸 작성
+
    - validateEventForm 함수
    - validateRepeatConfig 함수
    - 단위 테스트 작성
@@ -690,9 +758,11 @@ const handleEditSingleOccurrence = async () => {
 ---
 
 ### 단계 4: API 로직 통합
+
 **예상 작업량**: 1-2시간
 
 1. useEventOperations에 convertToSingleEvent 추가
+
    - 함수 구현
    - 에러 처리 통합
 
@@ -706,6 +776,7 @@ const handleEditSingleOccurrence = async () => {
 ---
 
 ### 단계 5: formatRepeatInfo 활용
+
 **예상 작업량**: 30분
 
 1. App.tsx 라인 718-727 리팩터링
@@ -733,6 +804,7 @@ const handleEditSingleOccurrence = async () => {
 ### 복잡한 로직 주석 추가
 
 1. **useEventOperations.ts**:
+
    - updateRecurringSeries 함수에 "반복 시리즈 전체를 수정하는 함수" 주석 추가
    - deleteRecurringSeries 함수에 404 처리 로직 설명 추가
 
@@ -749,20 +821,24 @@ const handleEditSingleOccurrence = async () => {
 ### 아키텍처 결정 사항 문서화
 
 1. **ARCHITECTURE.md** (새 파일 제안):
+
    ```markdown
    # 아키텍처 결정 기록 (ADR)
 
    ## ADR-001: 반복 일정 수정 방식
 
    ### 컨텍스트
+
    사용자가 반복 일정을 수정할 때, 단일 일정만 수정할지 전체 시리즈를 수정할지 선택해야 함.
 
    ### 결정
+
    - 다이얼로그를 통해 사용자에게 선택 제공
    - "예" 선택 시: 해당 일정을 단일 일정(repeat.type='none')으로 변환
    - "아니오" 선택 시: 전체 시리즈를 수정할 수 있도록 폼 로드
 
    ### 결과
+
    - 사용자 친화적인 UX
    - 데이터 무결성 보장
    - API 설계: PUT /api/recurring-events/:repeatId
@@ -797,6 +873,7 @@ const handleEditSingleOccurrence = async () => {
 
 **TypeScript**: ✅ 컴파일 성공 (에러 없음)
 **ESLint**: ⚠️ 11개 에러 발견
+
 - `task.useEventOperations.spec.ts`: 2개 (any 타입)
 - `task.repeat-event-integration.spec.ts`: 9개 (any 타입 5개, unused vars 4개)
 - `useNotifications.ts`: 1개 경고 (react-hooks/exhaustive-deps)
@@ -816,10 +893,12 @@ const handleEditSingleOccurrence = async () => {
 ### 렌더 성능
 
 **현재**:
+
 - 불필요한 리렌더링 없음 (커스텀 훅으로 분리됨)
 - 이벤트 목록이 대량이 아니므로 성능 문제 없음
 
 **리팩터링 후**:
+
 - 영향 없음 (성능 최적화 적용 보류)
 
 ### 번들 크기
@@ -827,6 +906,7 @@ const handleEditSingleOccurrence = async () => {
 **현재**: 측정 안 됨
 
 **리팩터링 후**:
+
 - constants 파일 추가로 ~1KB 증가 예상 (무시할 수준)
 - eventValidation.ts 추가로 ~2KB 증가 예상
 
@@ -835,6 +915,7 @@ const handleEditSingleOccurrence = async () => {
 **현재**: 정상
 
 **리팩터링 후**:
+
 - 타입 정의 증가로 미세한 증가 가능 (1초 이내)
 
 ---
@@ -844,10 +925,12 @@ const handleEditSingleOccurrence = async () => {
 ### 해결하지 못한 사항
 
 1. **App.tsx 크기 (879줄)**:
+
    - 컴포넌트 분리는 명시적 요청 시에만 진행
    - 현재 구조는 적절하게 유지됨
 
 2. **useNotifications 훅의 useEffect 의존성 경고**:
+
    - react-hooks/exhaustive-deps 경고 존재
    - 별도 이슈로 처리 권장
 
@@ -858,17 +941,20 @@ const handleEditSingleOccurrence = async () => {
 ### 후속 작업 제안
 
 1. **컴포넌트 분리 (선택적)**:
+
    - EventCard 컴포넌트 추출
    - EventFormSection 컴포넌트 추출
    - CalendarViewSection 컴포넌트 추출
    - **조건**: 사용자 명시적 요청 시
 
 2. **성능 최적화 (측정 후)**:
+
    - React.memo 적용
    - useMemo/useCallback 추가
    - **조건**: 실제 성능 문제 측정 후
 
 3. **i18n 지원**:
+
    - 메시지 상수를 다국어 지원 구조로 변경
    - **조건**: 다국어 요구사항 발생 시
 
@@ -885,12 +971,14 @@ const handleEditSingleOccurrence = async () => {
 Phase 4에서 구현된 반복 일정 수정 기능은 **기능적으로 완벽하게 동작**하며, 모든 요구사항을 충족합니다. 다만 다음 영역에서 개선이 필요합니다:
 
 **강점**:
+
 - ✅ 모든 테스트 통과 (8/8, 100%)
 - ✅ TypeScript 컴파일 성공
 - ✅ 명확한 비즈니스 로직 흐름
 - ✅ 커스텀 훅으로 관심사 분리
 
 **개선 필요**:
+
 - ⚠️ ESLint 에러 11개 (테스트 파일 any 타입)
 - ⚠️ MUI Select 경고 약 30개
 - ⚠️ 중복 코드 (Week/Month 뷰 렌더링)
@@ -900,6 +988,7 @@ Phase 4에서 구현된 반복 일정 수정 기능은 **기능적으로 완벽�
 ### 리팩터링 권장사항 요약
 
 #### 즉시 적용 권장 (Phase 1)
+
 1. **Material-UI Select 경고 해결**: `repeatType` 값 처리 개선
 2. **ESLint 에러 해결**: 테스트 파일 any 타입 제거
 3. **매직 넘버 상수화**: REPEAT_END_DATE_MAX 추출
@@ -909,6 +998,7 @@ Phase 4에서 구현된 반복 일정 수정 기능은 **기능적으로 완벽�
 **영향**: Console 깨끗해짐, 코드 품질 향상
 
 #### 점진적 적용 권장 (Phase 2~3)
+
 1. **EventCard 컴포넌트 추출**: 중복 제거
 2. **유효성 검사 로직 분리**: 순수 함수화
 3. **메시지 상수화**: i18n 대비
@@ -919,6 +1009,7 @@ Phase 4에서 구현된 반복 일정 수정 기능은 **기능적으로 완벽�
 **영향**: 유지보수성, 테스트 가능성 대폭 향상
 
 #### 선택적 적용 (Phase 4)
+
 1. **성능 최적화**: React.memo, useMemo 적용
 2. **컴포넌트 분리**: App.tsx 크기 감소
 
@@ -928,16 +1019,16 @@ Phase 4에서 구현된 반복 일정 수정 기능은 **기능적으로 완벽�
 
 ### 품질 지표 비교
 
-| 항목 | 현재 (Before) | 개선 목표 (After) |
-|------|--------------|------------------|
-| 테스트 통과 | 8/8 (100%) | 8/8 유지 |
-| TypeScript | ✅ 0 에러 | ✅ 0 유지 |
-| ESLint | ⚠️ 11 에러 | ✅ 0 |
-| MUI 경고 | ⚠️ 약 30개 | ✅ 0 |
-| 중복 코드 | 2곳 | 0곳 |
-| 최대 함수 길이 | 79줄 | 30줄 이하 |
-| 매직 문자열 | 15+ | 0 |
-| App.tsx 크기 | 879줄 | 600줄 이하 |
+| 항목           | 현재 (Before) | 개선 목표 (After) |
+| -------------- | ------------- | ----------------- |
+| 테스트 통과    | 8/8 (100%)    | 8/8 유지          |
+| TypeScript     | ✅ 0 에러     | ✅ 0 유지         |
+| ESLint         | ⚠️ 11 에러    | ✅ 0              |
+| MUI 경고       | ⚠️ 약 30개    | ✅ 0              |
+| 중복 코드      | 2곳           | 0곳               |
+| 최대 함수 길이 | 79줄          | 30줄 이하         |
+| 매직 문자열    | 15+           | 0                 |
+| App.tsx 크기   | 879줄         | 600줄 이하        |
 
 ### 최종 권고
 
@@ -950,6 +1041,7 @@ Phase 4에서 구현된 반복 일정 수정 기능은 **기능적으로 완벽�
 3. **비즈니스 요구사항**: 새로운 기능 개발이 우선이면 Phase 1만 적용
 
 **권장 접근 방식**:
+
 - Phase 1 (긴급 수정)을 먼저 적용해 Console 경고 제거
 - Phase 2~3는 별도 브랜치에서 점진적으로 진행
 - 각 단계마다 테스트 통과 확인 필수
@@ -969,17 +1061,20 @@ Phase 4에서 구현된 반복 일정 수정 기능은 **기능적으로 완벽�
 개선사항을 적용할 때 다음 체크리스트를 사용하세요:
 
 ### 적용 전 체크리스트
+
 - [ ] 현재 브랜치가 최신 상태인가?
 - [ ] 모든 테스트가 통과하는가?
 - [ ] 변경사항을 되돌릴 수 있는가? (Git stash/branch)
 
 ### 적용 중 체크리스트
+
 - [ ] 한 번에 하나의 개선사항만 적용하는가?
 - [ ] 각 변경 후 테스트를 실행했는가?
 - [ ] TypeScript 컴파일이 성공하는가?
 - [ ] ESLint가 통과하는가?
 
 ### 적용 후 체크리스트
+
 - [ ] 모든 테스트가 통과하는가? (8/8)
 - [ ] 기능 동작에 변화가 없는가?
 - [ ] Console 경고가 해결되었는가?

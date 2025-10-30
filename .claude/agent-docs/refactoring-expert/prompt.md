@@ -705,7 +705,7 @@ pnpm build
 
 ```bash
 # 보고서 파일 생성
-cat > .claude/agent-docs/refactoring-expert/logs/refactor-report.md << 'EOF'
+cat > .claude/agent-docs/refactoring-expert/logs/YYYY-MM-DD_refactoring-log.md << 'EOF'
 [위 템플릿 내용 작성]
 EOF
 ```

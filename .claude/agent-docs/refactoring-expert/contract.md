@@ -17,6 +17,7 @@
 Refactoring Expert는 **Phase 5 (REFACTOR)**에서 동작하며, GREEN 단계에서 작성된 동작하는 코드를 테스트 통과를 유지하면서 품질을 향상시키는 역할을 수행한다.
 
 **핵심 책임:**
+
 - 코드 중복 제거 (DRY 원칙)
 - React 성능 최적화 (memo, useMemo, useCallback)
 - TypeScript 타입 안전성 강화 (any 제거)
@@ -25,16 +26,19 @@ Refactoring Expert는 **Phase 5 (REFACTOR)**에서 동작하며, GREEN 단계에
 - 리팩터링 근거 문서화
 
 **선행 조건:**
+
 - Phase 4 (GREEN)이 완료되어야 함
 - 모든 테스트가 통과한 상태여야 함
 - TypeScript 컴파일 성공
 - Orchestrator가 생성한 Handoff 문서가 존재해야 함
 
 **후속 단계:**
+
 - Phase 6 (VALIDATE)로 전달
 - Orchestrator가 최종 검증 수행
 
 **핵심 제약:**
+
 - ⚠️ **테스트는 반드시 통과를 유지해야 함**
 - ⚠️ **기능 변경 금지** (동작 보존)
 - ⚠️ **테스트 파일은 수정하지 않음** (프로덕션 코드만 개선)
@@ -74,10 +78,10 @@ inputs:
     coverage: [커버리지 %]
 
   context_files:
-    - CLAUDE.md                    # 프로젝트 규칙
-    - .claude/docs/folder-tree.md  # 프로젝트 구조
-    - .claude/agent-docs/feature-designer/logs/spec.md  # 기능 명세
-    - .claude/agent-docs/test-designer/logs/test-strategy.md  # 테스트 전략
+    - CLAUDE.md # 프로젝트 규칙
+    - .claude/docs/folder-tree.md # 프로젝트 구조
+    - .claude/agent-docs/feature-designer/logs/spec.md # 기능 명세
+    - .claude/agent-docs/test-designer/logs/test-strategy.md # 테스트 전략
 
 references:
   agent_definition: ../../agents/refactoring-expert.md
@@ -85,7 +89,7 @@ references:
   previous_phase: ../code-writer/logs/green-phase-log.md
 
 output_requirements:
-  path: .claude/agent-docs/refactoring-expert/logs/refactor-report.md
+  path: .claude/agent-docs/refactoring-expert/logs/YYYY-MM-DD_refactoring-log.md
   required_sections:
     - 리팩터링 요약
     - 개선 사항 상세
@@ -126,16 +130,17 @@ validation_criteria:
 
 ```typescript
 {
-  status: 'PASS';               // 반드시 PASS여야 함
-  all_tests_passing: true;      // 모든 테스트 통과
-  test_command: string;         // 실행한 테스트 명령어
-  output: string;               // 테스트 실행 결과
+  status: 'PASS'; // 반드시 PASS여야 함
+  all_tests_passing: true; // 모든 테스트 통과
+  test_command: string; // 실행한 테스트 명령어
+  output: string; // 테스트 실행 결과
 }
 ```
 
 #### 3. context_files (필수)
 
 최소 포함 파일:
+
 - `CLAUDE.md` - 프로젝트 규칙
 - `.claude/docs/folder-tree.md` - 프로젝트 구조
 - Feature Designer의 명세서 (설계 의도 파악)
@@ -148,36 +153,38 @@ validation_criteria:
 ### 출력 파일 경로
 
 ```
-.claude/agent-docs/refactoring-expert/logs/refactor-report.md
+.claude/agent-docs/refactoring-expert/logs/YYYY-MM-DD_refactoring-log.md
 ```
 
 ### 필수 출력 구조
 
-```markdown
+````markdown
 # 리팩터링 보고서: [기능명]
 
 ## 1. 요약
 
 ### 1.1 리팩터링 개요
+
 - **대상 기능**: [기능명]
 - **리팩터링 시작 시각**: [ISO 8601]
 - **리팩터링 완료 시각**: [ISO 8601]
 - **전체 품질 평가**: [1-2문장 요약]
 
 ### 1.2 최우선 개선 사항 (Top 3)
+
 1. [개선 1] - [이유]
 2. [개선 2] - [이유]
 3. [개선 3] - [이유]
 
 ### 1.3 주요 지표
 
-| 지표 | Before | After | 개선율 |
-|------|--------|-------|--------|
-| 코드 중복 | [N개] | [M개] | [-X%] |
-| any 타입 사용 | [N개] | [0개] | [-100%] |
-| ESLint 경고 | [N개] | [M개] | [-X%] |
-| TypeScript 에러 | [N개] | [0개] | [-100%] |
-| 테스트 통과율 | 100% | 100% | 유지 ✅ |
+| 지표            | Before | After | 개선율  |
+| --------------- | ------ | ----- | ------- |
+| 코드 중복       | [N개]  | [M개] | [-X%]   |
+| any 타입 사용   | [N개]  | [0개] | [-100%] |
+| ESLint 경고     | [N개]  | [M개] | [-X%]   |
+| TypeScript 에러 | [N개]  | [0개] | [-100%] |
+| 테스트 통과율   | 100%   | 100%  | 유지 ✅ |
 
 ## 2. 개선 사항 상세
 
@@ -191,6 +198,7 @@ validation_criteria:
 [중복 코드나 반복 패턴 설명]
 
 **영향**:
+
 - 유지보수 비용 증가
 - 버그 발생 위험 증가
 - 코드 가독성 저하
@@ -198,6 +206,7 @@ validation_criteria:
 **우선순위**: 높음
 
 **변경 전**:
+
 ```typescript
 // 파일: src/hooks/useEventForm.ts
 const validateStartTime = (startTime: string) => {
@@ -216,8 +225,10 @@ const validateEndTime = (endTime: string) => {
   return true;
 };
 ```
+````
 
 **변경 후**:
+
 ```typescript
 // 파일: src/utils/timeValidation.ts
 export const validateTimeInput = (
@@ -238,11 +249,13 @@ const isEndTimeValid = validateTimeInput(endTime, '종료 시간', enqueueSnackb
 ```
 
 **설명**:
+
 - 중복된 유효성 검사 로직을 공통 유틸리티 함수로 추출
 - 순수 함수 원칙 준수 (외부 상태 의존 없음)
 - 재사용성 향상
 
 **테스트 고려사항**:
+
 - 기존 테스트가 여전히 통과하는지 확인
 - `pnpm test task.[feature].spec.ts` 실행
 
@@ -258,6 +271,7 @@ const isEndTimeValid = validateTimeInput(endTime, '종료 시간', enqueueSnackb
 [불필요한 리렌더링, 비용 큰 계산 등]
 
 **영향**:
+
 - 성능 저하
 - 사용자 경험 악화
 - 배터리 소모 증가
@@ -265,25 +279,19 @@ const isEndTimeValid = validateTimeInput(endTime, '종료 시간', enqueueSnackb
 **우선순위**: 중간
 
 **변경 전**:
+
 ```typescript
 // 파일: src/components/EventList.tsx
 const EventList = ({ events, onEdit, onDelete }: EventListProps) => {
   // 매 렌더마다 필터링 재계산
-  const filteredEvents = events.filter(event =>
-    event.date >= today
-  ).sort((a, b) =>
-    new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+  const filteredEvents = events
+    .filter((event) => event.date >= today)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   return (
     <Box>
-      {filteredEvents.map(event => (
-        <EventCard
-          key={event.id}
-          event={event}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
+      {filteredEvents.map((event) => (
+        <EventCard key={event.id} event={event} onEdit={onEdit} onDelete={onDelete} />
       ))}
     </Box>
   );
@@ -291,6 +299,7 @@ const EventList = ({ events, onEdit, onDelete }: EventListProps) => {
 ```
 
 **변경 후**:
+
 ```typescript
 // 파일: src/components/EventList.tsx
 const EventList = memo(({ events, onEdit, onDelete }: EventListProps) => {
@@ -298,29 +307,30 @@ const EventList = memo(({ events, onEdit, onDelete }: EventListProps) => {
   const filteredEvents = useMemo(
     () =>
       events
-        .filter(event => event.date >= today)
+        .filter((event) => event.date >= today)
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
     [events]
   );
 
   // 콜백 함수는 useCallback으로 참조 안정화
-  const handleEdit = useCallback((id: string) => {
-    onEdit(id);
-  }, [onEdit]);
+  const handleEdit = useCallback(
+    (id: string) => {
+      onEdit(id);
+    },
+    [onEdit]
+  );
 
-  const handleDelete = useCallback((id: string) => {
-    onDelete(id);
-  }, [onDelete]);
+  const handleDelete = useCallback(
+    (id: string) => {
+      onDelete(id);
+    },
+    [onDelete]
+  );
 
   return (
     <Box>
-      {filteredEvents.map(event => (
-        <EventCard
-          key={event.id}
-          event={event}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+      {filteredEvents.map((event) => (
+        <EventCard key={event.id} event={event} onEdit={handleEdit} onDelete={handleDelete} />
       ))}
     </Box>
   );
@@ -328,12 +338,14 @@ const EventList = memo(({ events, onEdit, onDelete }: EventListProps) => {
 ```
 
 **설명**:
+
 - `React.memo`로 props 변경 시에만 리렌더
 - `useMemo`로 비용 큰 필터링/정렬 계산 메모이제이션
 - `useCallback`으로 자식 컴포넌트 props 참조 안정화
 - 명확한 성능 이점이 있는 경우에만 적용 (성급한 최적화 지양)
 
 **테스트 고려사항**:
+
 - 기능 동작이 동일한지 확인
 - 렌더 횟수가 감소했는지 React DevTools로 확인
 
@@ -349,6 +361,7 @@ const EventList = memo(({ events, onEdit, onDelete }: EventListProps) => {
 [any 사용, 타입 주석 누락 등]
 
 **영향**:
+
 - 타입 안전성 손실
 - IDE 자동완성 불가
 - 런타임 에러 위험
@@ -356,6 +369,7 @@ const EventList = memo(({ events, onEdit, onDelete }: EventListProps) => {
 **우선순위**: 높음
 
 **변경 전**:
+
 ```typescript
 // 파일: src/utils/eventUtils.ts
 export const groupEventsByDate = (events: any) => {
@@ -371,11 +385,10 @@ export const groupEventsByDate = (events: any) => {
 ```
 
 **변경 후**:
+
 ```typescript
 // 파일: src/utils/eventUtils.ts
-export const groupEventsByDate = (
-  events: Event[]
-): Record<string, Event[]> => {
+export const groupEventsByDate = (events: Event[]): Record<string, Event[]> => {
   const grouped: Record<string, Event[]> = {};
   events.forEach((event) => {
     if (!grouped[event.date]) {
@@ -388,11 +401,13 @@ export const groupEventsByDate = (
 ```
 
 **설명**:
+
 - 모든 `any` 타입을 구체적인 타입으로 대체
 - 반환 타입 명시로 타입 안전성 확보
 - IDE 자동완성 및 타입 체킹 활성화
 
 **테스트 고려사항**:
+
 - `pnpm lint:tsc` 실행하여 타입 에러 없는지 확인
 
 ---
@@ -407,6 +422,7 @@ export const groupEventsByDate = (
 [복잡한 로직, 매직 넘버, 불명확한 이름 등]
 
 **영향**:
+
 - 코드 이해 어려움
 - 유지보수 비용 증가
 - 버그 발생 위험
@@ -414,6 +430,7 @@ export const groupEventsByDate = (
 **우선순위**: 중간
 
 **변경 전**:
+
 ```typescript
 // 파일: src/utils/dateUtils.ts
 export const getWeekDates = (date: Date) => {
@@ -432,6 +449,7 @@ export const getWeekDates = (date: Date) => {
 ```
 
 **변경 후**:
+
 ```typescript
 // 파일: src/utils/dateUtils.ts
 const DAYS_IN_WEEK = 7;
@@ -444,9 +462,8 @@ export const getWeekDates = (date: Date): Date[] => {
   const dayOfWeek = targetDate.getDay();
 
   // 월요일로 정규화
-  const daysFromMonday = dayOfWeek === SUNDAY_INDEX
-    ? DAYS_TO_SUBTRACT_FOR_SUNDAY
-    : MONDAY_OFFSET - dayOfWeek;
+  const daysFromMonday =
+    dayOfWeek === SUNDAY_INDEX ? DAYS_TO_SUBTRACT_FOR_SUNDAY : MONDAY_OFFSET - dayOfWeek;
 
   const mondayDate = new Date(targetDate);
   mondayDate.setDate(targetDate.getDate() + daysFromMonday);
@@ -461,12 +478,14 @@ export const getWeekDates = (date: Date): Date[] => {
 ```
 
 **설명**:
+
 - 매직 넘버를 명명된 상수로 추출
 - 변수명을 명확하게 개선 (`d` → `targetDate`, `day` → `dayOfWeek`)
 - 복잡한 로직을 단계별로 분해하여 가독성 향상
 - 명확한 주석 추가
 
 **테스트 고려사항**:
+
 - 동일한 입력에 동일한 출력 반환 확인
 
 ---
@@ -481,6 +500,7 @@ export const getWeekDates = (date: Date): Date[] => {
 [관심사 분리 부족, 결합도 높음 등]
 
 **영향**:
+
 - 코드 재사용 어려움
 - 테스트 복잡도 증가
 - 확장성 저하
@@ -488,6 +508,7 @@ export const getWeekDates = (date: Date): Date[] => {
 **우선순위**: 낮음
 
 **변경 전**:
+
 ```typescript
 // 파일: src/hooks/useEventForm.ts
 const useEventForm = () => {
@@ -501,7 +522,7 @@ const useEventForm = () => {
     try {
       await fetch('/api/events', {
         method: 'POST',
-        body: JSON.stringify(eventData)
+        body: JSON.stringify(eventData),
       });
     } catch (error) {
       console.error(error);
@@ -511,6 +532,7 @@ const useEventForm = () => {
 ```
 
 **변경 후**:
+
 ```typescript
 // 파일: src/hooks/useEventForm.ts
 const useEventForm = () => {
@@ -521,9 +543,7 @@ const useEventForm = () => {
     // 관심사 분리: 유효성 검사는 별도 훅으로
     const validation = validateEventForm(eventData);
     if (!validation.isValid) {
-      validation.errors.forEach(error =>
-        enqueueSnackbar(error, { variant: 'error' })
-      );
+      validation.errors.forEach((error) => enqueueSnackbar(error, { variant: 'error' }));
       return;
     }
 
@@ -539,11 +559,13 @@ const useEventForm = () => {
 ```
 
 **설명**:
+
 - 단일 책임 원칙 적용 (유효성 검사, API 호출 분리)
 - 커스텀 훅으로 로직 캡슐화
 - 재사용성 및 테스트 용이성 향상
 
 **테스트 고려사항**:
+
 - 각 훅을 독립적으로 테스트 가능
 
 ---
@@ -553,22 +575,26 @@ const useEventForm = () => {
 ### 3.1 변경 순서 (안전한 것 → 위험한 것)
 
 1. **Step 1: 타입 안전성 강화** (가장 안전)
+
    - any 타입 제거
    - 반환 타입 명시
    - 예상 작업량: 30분
 
 2. **Step 2: 코드 중복 제거**
+
    - 공통 로직을 유틸 함수로 추출
    - 테스트 실행하여 동작 보존 확인
    - 예상 작업량: 1시간
 
 3. **Step 3: 가독성 개선**
+
    - 변수명 개선
    - 매직 넘버 상수화
    - 주석 추가
    - 예상 작업량: 30분
 
 4. **Step 4: 성능 최적화** (주의 필요)
+
    - memo, useMemo, useCallback 적용
    - 각 변경 후 테스트 실행
    - 예상 작업량: 1시간
@@ -625,16 +651,15 @@ pnpm build
 - 성능 최적화 근거
 
 **예시:**
+
 ```typescript
 // 윤년 2월 29일 처리: 평년에는 3월 1일로 대체
-const adjustedDate = isLeapYear(year)
-  ? new Date(year, 1, 29)
-  : new Date(year, 2, 1);
+const adjustedDate = isLeapYear(year) ? new Date(year, 1, 29) : new Date(year, 2, 1);
 ```
 
 ### 4.2 타입 문서화 권장
 
-```typescript
+````typescript
 /**
  * 일정 데이터를 날짜별로 그룹화
  *
@@ -650,12 +675,10 @@ const adjustedDate = isLeapYear(year)
  * // { '2025-10-30': [event1, event2] }
  * ```
  */
-export const groupEventsByDate = (
-  events: Event[]
-): Record<string, Event[]> => {
+export const groupEventsByDate = (events: Event[]): Record<string, Event[]> => {
   // ...
 };
-```
+````
 
 ### 4.3 아키텍처 결정 기록
 
@@ -671,16 +694,19 @@ EventList 컴포넌트가 부모 리렌더 시 불필요하게 리렌더됨.
 
 **결정:**
 React.memo 적용하되, 다음 조건을 만족할 때만 적용:
+
 1. 렌더 비용이 큼 (많은 DOM 노드 또는 비용 큰 계산)
 2. props가 자주 변경되지 않음
 3. 성능 프로파일링으로 효과 확인됨
 
 **근거:**
+
 - 성급한 최적화 방지
 - 코드 복잡도 증가 최소화
 - 명확한 이점이 있을 때만 적용
 
 **영향:**
+
 - EventList, CalendarView 컴포넌트에 적용
 - 나머지 컴포넌트는 프로파일링 후 결정
 ```
@@ -751,23 +777,23 @@ $ pnpm build
 
 **측정 방법**: React DevTools Profiler
 
-| 컴포넌트 | Before (ms) | After (ms) | 개선 |
-|----------|-------------|------------|------|
-| EventList | 45ms | 12ms | -73% |
-| CalendarView | 80ms | 60ms | -25% |
+| 컴포넌트     | Before (ms) | After (ms) | 개선 |
+| ------------ | ----------- | ---------- | ---- |
+| EventList    | 45ms        | 12ms       | -73% |
+| CalendarView | 80ms        | 60ms       | -25% |
 
 ### 6.2 번들 크기
 
-| 항목 | Before | After | 차이 |
-|------|--------|-------|------|
-| 번들 크기 | 250KB | 248KB | -2KB |
-| Gzipped | 80KB | 79KB | -1KB |
+| 항목      | Before | After | 차이 |
+| --------- | ------ | ----- | ---- |
+| 번들 크기 | 250KB  | 248KB | -2KB |
+| Gzipped   | 80KB   | 79KB  | -1KB |
 
 ### 6.3 TypeScript 컴파일 시간
 
-| 항목 | Before | After |
-|------|--------|-------|
-| 컴파일 시간 | 3.2s | 3.0s ✅ |
+| 항목        | Before | After   |
+| ----------- | ------ | ------- |
+| 컴파일 시간 | 3.2s   | 3.0s ✅ |
 
 ---
 
@@ -776,6 +802,7 @@ $ pnpm build
 ### 7.1 현재 리팩터링에서 해결하지 못한 사항
 
 1. **App.tsx 컴포넌트 분리** (661줄)
+
    - 이유: 명시적 요청 없음
    - 우선순위: 낮음
    - 향후 과제로 보류
@@ -788,10 +815,12 @@ $ pnpm build
 ### 7.2 후속 작업 제안
 
 1. **성능 프로파일링 추가**
+
    - React DevTools로 실제 사용 시나리오 측정
    - 병목 지점 추가 최적화
 
 2. **테스트 커버리지 개선**
+
    - 현재 커버리지: 85%
    - 목표 커버리지: 90%+
    - 엣지 케이스 테스트 추가
@@ -807,6 +836,7 @@ $ pnpm build
 ### 8.1 리팩터링 성과
 
 ✅ **성공 지표:**
+
 - 테스트 100% 통과 유지
 - any 타입 0개 (완전 제거)
 - ESLint 경고 0개
@@ -814,6 +844,7 @@ $ pnpm build
 - 렌더 성능 25-73% 개선
 
 ✅ **코드 품질:**
+
 - DRY 원칙 준수
 - 타입 안전성 확보
 - React 최적화 적용
@@ -823,6 +854,7 @@ $ pnpm build
 ### 8.2 Phase 6 준비 완료
 
 다음 검증 항목:
+
 - [x] 모든 테스트 통과
 - [x] TypeScript 에러 없음
 - [x] ESLint 경고 없음
@@ -830,7 +862,8 @@ $ pnpm build
 - [x] 리팩터링 근거 문서화
 
 **Phase 6 (VALIDATE)로 진행 가능합니다.** ✅
-```
+
+````
 
 ---
 
@@ -893,27 +926,31 @@ pnpm lint
 pnpm build
 
 # 7. 리팩터링 보고서 존재 확인
-ls -la .claude/agent-docs/refactoring-expert/logs/refactor-report.md
-```
+ls -la .claude/agent-docs/refactoring-expert/logs/YYYY-MM-DD_refactoring-log.md
+````
 
 ### 품질 기준
 
 **동작 보존 (Behavior Preservation)**
+
 - ❌ 기능 변경
 - ✅ 동일한 동작 유지
 - ✅ 테스트 100% 통과
 
 **근거 기반 최적화 (Justified Optimization)**
+
 - ❌ "더 나아 보여서"
 - ✅ "렌더 횟수가 N배 감소"
 - ✅ "번들 크기가 X% 감소"
 
 **점진적 개선 (Incremental Improvement)**
+
 - ❌ 전체 재작성
 - ✅ 작은 안전한 변경
 - ✅ 각 단계마다 테스트
 
 **실용성 (Pragmatism)**
+
 - ❌ 과도한 추상화
 - ✅ 필요한 수준의 품질
 - ✅ 완벽함과 실용성의 균형
@@ -935,7 +972,7 @@ status: ready
 previous_phase: 5
 
 inputs:
-  refactor_report: .claude/agent-docs/refactoring-expert/logs/refactor-report.md
+  refactor_report: .claude/agent-docs/refactoring-expert/logs/YYYY-MM-DD_refactoring-log.md
   implementation_files:
     - [리팩터링된 파일 목록]
   test_files:
@@ -944,9 +981,9 @@ inputs:
   all_phase_logs:
     - .claude/agent-docs/feature-designer/logs/spec.md
     - .claude/agent-docs/test-designer/logs/test-strategy.md
-    - .claude/agent-docs/test-writer/logs/red-phase-log.md
-    - .claude/agent-docs/code-writer/logs/green-phase-log.md
-    - .claude/agent-docs/refactoring-expert/logs/refactor-report.md
+    - .claude/agent-docs/test-writer/logs/YYYY-MM-DD_test-writing-log.md
+    - .claude/agent-docs/code-writer/logs/YYYY-MM-DD_implementation-log.md
+    - .claude/agent-docs/refactoring-expert/logs/YYYY-MM-DD_refactoring-log.md
 
 references:
   agent_definition: ../../agents/orchestrator.md
@@ -980,19 +1017,21 @@ validation_criteria:
 ### Refactoring Expert가 할 수 있는 것
 
 ✅ **허용:**
+
 - Handoff 문서 읽기
 - refactoring-expert.md 참조
 - CLAUDE.md 읽기
 - Phase 4 산출물 (구현 코드) 읽기
 - Phase 1-2 산출물 (명세서, 테스트 전략) 참조
 - implementation_files에 명시된 파일 수정
-- logs/refactor-report.md 작성
+- logs/YYYY-MM-DD_refactoring-log.md 작성
 - references/ 디렉토리에 참고 자료 저장
 - 테스트 실행 (검증용)
 
 ### Refactoring Expert가 할 수 없는 것
 
 ❌ **금지:**
+
 - 테스트 파일 수정 (절대 금지)
 - 기능 변경 (동작 보존 필수)
 - 다른 Phase의 Handoff 문서 읽기
@@ -1005,10 +1044,7 @@ validation_criteria:
 
 ```typescript
 // 개념적 모델
-type RefactoringExpert = (
-  handoff: HandoffDoc,
-  code: ProductionCode
-) => RefactoredCode;
+type RefactoringExpert = (handoff: HandoffDoc, code: ProductionCode) => RefactoredCode;
 
 // 특성
 // - 동일한 입력 → 동일한 출력
@@ -1027,6 +1063,7 @@ type RefactoringExpert = (
 **상황:** 리팩터링 후 테스트 실패
 
 **조치:**
+
 1. 즉시 변경 사항 되돌리기
 2. 실패 원인 분석
 3. `references/issues-log.md`에 문제 기록
@@ -1034,25 +1071,31 @@ type RefactoringExpert = (
 5. Orchestrator에게 보고
 
 **예시:**
+
 ```markdown
 ## ⚠️ 리팩터링 실패
 
 ### 실패한 변경
+
 파일: src/hooks/useEventForm.ts
 변경: 유효성 검사 로직을 유틸로 추출
 
 ### 실패 원인
+
 테스트: "시작 시간 유효성 검사"
 에러: enqueueSnackbar가 undefined
 
 ### 근본 원인
+
 순수 함수로 추출하면서 enqueueSnackbar 접근 불가
 
 ### 해결 방안
+
 1. enqueueSnackbar를 파라미터로 전달
 2. 또는 유효성 검사는 훅 내부에 유지
 
 ### 조치
+
 변경 사항 롤백 후 방안 1로 재시도
 ```
 
@@ -1061,6 +1104,7 @@ type RefactoringExpert = (
 **상황:** any 제거 시 타입 에러 발생
 
 **조치:**
+
 1. 에러 메시지 분석
 2. 적절한 타입 정의 추가
 3. 필요 시 제네릭 활용
@@ -1068,16 +1112,17 @@ type RefactoringExpert = (
 5. 컴파일 성공 확인
 
 **예시:**
+
 ```typescript
 // ❌ 타입 에러
-const result = data.map(item => item.value); // item이 any
+const result = data.map((item) => item.value); // item이 any
 
 // ✅ 해결 1: 명시적 타입
 const result = data.map((item: DataItem) => item.value);
 
 // ✅ 해결 2: 제네릭
 const mapValues = <T extends { value: string }>(data: T[]): string[] => {
-  return data.map(item => item.value);
+  return data.map((item) => item.value);
 };
 ```
 
@@ -1086,6 +1131,7 @@ const mapValues = <T extends { value: string }>(data: T[]): string[] => {
 **상황:** 최적화가 오히려 성능 저하
 
 **조치:**
+
 1. React DevTools Profiler로 측정
 2. 최적화 전/후 비교
 3. 성능 저하 시 최적화 제거
@@ -1093,18 +1139,20 @@ const mapValues = <T extends { value: string }>(data: T[]): string[] => {
 5. 측정 결과 문서화
 
 **예시:**
+
 ```markdown
 ## 성능 측정 결과
 
 ### 시나리오: 10개 이벤트 렌더링
 
-| 최적화 | 렌더 시간 | 결과 |
-|--------|----------|------|
-| 최적화 전 | 25ms | 기준 |
-| React.memo 적용 | 40ms ❌ | 오히려 느려짐 |
-| useMemo만 적용 | 15ms ✅ | 40% 개선 |
+| 최적화          | 렌더 시간 | 결과          |
+| --------------- | --------- | ------------- |
+| 최적화 전       | 25ms      | 기준          |
+| React.memo 적용 | 40ms ❌   | 오히려 느려짐 |
+| useMemo만 적용  | 15ms ✅   | 40% 개선      |
 
 ### 결정
+
 - React.memo 제거 (오버헤드)
 - useMemo만 유지 (실제 이득)
 ```
@@ -1114,6 +1162,7 @@ const mapValues = <T extends { value: string }>(data: T[]): string[] => {
 **상황:** 리팩터링이 프로젝트 아키텍처와 충돌
 
 **조치:**
+
 1. 충돌 지점 명시
 2. 현재 아키텍처 원칙 확인
 3. 대안 제시
@@ -1121,15 +1170,19 @@ const mapValues = <T extends { value: string }>(data: T[]): string[] => {
 5. 승인 후 진행
 
 **예시:**
+
 ```markdown
 ## ⚠️ 아키텍처 충돌
 
 ### 문제
+
 리팩터링: 전역 캐시 레이어 추가 권장
 프로젝트 원칙: 전역 상태 라이브러리 미사용
 
 ### 대안
+
 1. **로컬 캐시만 사용** (권장)
+
    - Context API로 제한된 범위 캐싱
    - 프로젝트 원칙 준수
 
@@ -1138,6 +1191,7 @@ const mapValues = <T extends { value: string }>(data: T[]): string[] => {
    - 서버 캐싱 활용
 
 ### 결정 필요
+
 Orchestrator 승인 대기
 ```
 
@@ -1150,7 +1204,7 @@ Orchestrator 승인 대기
 ```
 .claude/agent-docs/refactoring-expert/
 ├── logs/
-│   ├── refactor-report.md         # 리팩터링 보고서 (필수)
+│   ├── YYYY-MM-DD_refactoring-log.md  # 리팩터링 보고서 (필수)
 │   └── performance-analysis.md    # 성능 분석 (선택)
 │
 └── references/
@@ -1159,7 +1213,7 @@ Orchestrator 승인 대기
     └── optimization-rationale.md  # 최적화 근거
 ```
 
-### refactor-report.md 템플릿
+### YYYY-MM-DD_refactoring-log.md 템플릿
 
 상단 [출력 계약](#출력-계약) 섹션 참조
 

@@ -419,9 +419,9 @@ pnpm test
 
 ## 구현 로그 작성
 
-### implementation.md 작성
+### YYYY-MM-DD_implementation-log.md 작성
 
-**위치**: `.claude/agent-docs/code-writer/logs/implementation.md`
+**위치**: `.claude/agent-docs/code-writer/logs/YYYY-MM-DD_implementation-log.md`
 
 **필수 섹션:**
 1. 실행 요약
@@ -437,7 +437,7 @@ pnpm test
 - 로그 작성 후 Orchestrator에게 보고
 
 **템플릿:**
-[contract.md의 implementation.md 섹션 참조](./contract.md#implementationmd-필수-구조)
+[contract.md의 YYYY-MM-DD_implementation-log.md 섹션 참조](./contract.md#yyyy-mm-dd_implementation-logmd-필수-구조)
 
 ---
 
@@ -691,8 +691,8 @@ const title = event?.title ?? '제목 없음';
 ### 1. 로그 작성
 
 ```bash
-# implementation.md 작성
-.claude/agent-docs/code-writer/logs/implementation.md
+# implementation-log.md 작성
+.claude/agent-docs/code-writer/logs/YYYY-MM-DD_implementation-log.md
 ```
 
 **필수 포함 사항:**

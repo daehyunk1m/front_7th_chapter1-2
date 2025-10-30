@@ -348,7 +348,7 @@ pnpm test
 
 ### Step 9: 구현 로그 작성
 
-**파일**: `.claude/agent-docs/code-writer/logs/implementation.md`
+**파일**: `.claude/agent-docs/code-writer/logs/YYYY-MM-DD_implementation-log.md`
 
 **템플릿**: [contract.md 참조](./contract.md#implementationmd-필수-구조)
 
@@ -900,7 +900,7 @@ Code Writer의 작업이 완료되면 Refactoring Expert가 코드 품질을 개
 ### 문제가 해결되지 않을 때
 
 1. **Orchestrator에게 보고**
-   - implementation.md에 문제 상황 기록
+   - YYYY-MM-DD_implementation-log.md에 문제 상황 기록
    - 시도한 해결책 명시
    - 추가 지원 요청
 

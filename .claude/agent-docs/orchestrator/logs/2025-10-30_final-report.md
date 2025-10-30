@@ -274,7 +274,7 @@ fetchEvents() (UI 갱신)
 ### 설계 문서
 3. `.claude/agent-docs/feature-designer/logs/2025-10-30_repeat-event-spec.md` (1,555줄)
 4. `.claude/agent-docs/test-designer/logs/2025-10-30_repeat-event-test-strategy.md` (1,114줄)
-5. `.claude/agent-docs/test-designer/TEST_STRATEGY_SUMMARY.md` (400줄)
+5. `.claude/agent-docs/test-designer/logs/2025-10-30_test-strategy-summary.md` (400줄)
 
 ### 보고서
 6. `.claude/agent-docs/test-designer/COMPLETION_REPORT.md` (400줄)

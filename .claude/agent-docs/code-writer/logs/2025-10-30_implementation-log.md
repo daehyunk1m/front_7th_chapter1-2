@@ -1,8 +1,9 @@
-# Code Writer Implementation Log
+# Implementation Log (GREEN Phase)
 
-**Date**: 2025-10-30
-**Phase**: 4/6 - GREEN (Implementation)
-**Status**: Partial Success (5/8 tests passing)
+**작성일**: 2025-10-30  
+**Phase**: 4/6 - GREEN (Implementation)  
+**기능**: 반복 일정 수정 - 단일/전체 수정 선택  
+**최종 상태**: Success (8/8 tests passing)
 
 ---
 
@@ -75,6 +76,7 @@ const handleEditSingleOccurrence = async () => {
 **목적**: 선택된 반복 일정을 단일 일정으로 변경
 
 **기능**:
+
 - repeatInfo 제거하여 단일 일정으로 변경
 - PUT /api/events/:id 호출
 - 성공 시 목록 갱신 및 다이얼로그 닫기
@@ -104,6 +106,7 @@ const handleEditAllOccurrences = () => {
 **목적**: 반복 시리즈 전체 수정 모드로 진입
 
 **기능**:
+
 - `editEvent()` 호출하여 폼에 데이터 로드
 - `isEditingRecurringSeries` 플래그 설정
 - 다이얼로그 닫기
@@ -125,6 +128,7 @@ const handleCancelDialog = () => {
 **목적**: 다이얼로그 취소 처리
 
 **기능**:
+
 - 다이얼로그 닫기
 - 선택된 이벤트 초기화
 
@@ -166,6 +170,7 @@ if (editingEvent && isEditingRecurringSeries && editingEvent.repeat.id) {
 **목적**: 반복 시리즈 전체 수정 분기 추가
 
 **기능**:
+
 - `isEditingRecurringSeries` 플래그 확인
 - 전체 시리즈 수정 API 호출
 - 404 에러 처리
@@ -220,6 +225,7 @@ if (editingEvent && isEditingRecurringSeries && editingEvent.repeat.id) {
 ```
 
 **변경 사항**:
+
 - 메시지 변경: "모든 일정을 수정하시겠습니까?" → "해당 일정만 수정하시겠어요?"
 - 버튼 3개로 변경: "취소", "예" (단일 수정), "아니오" (전체 수정)
 - data-testid 추가: 모든 버튼에 고유 식별자 부여
@@ -262,6 +268,7 @@ const updateRecurringSeries = async (
 ```
 
 **변경 사항**:
+
 - 404 에러 시 `throw new Error('Recurring series not found')` 추가
 - catch 블록에서 에러 re-throw하여 상위에서 처리 가능하도록 수정
 
@@ -300,16 +307,19 @@ const {
 ### 실패한 테스트 (3/8)
 
 ❌ **단일 일정 수정 시 다이얼로그가 표시되지 않아야 함**
+
 - **원인**: `개인 약속` 텍스트를 찾을 수 없음
 - **분석**: 단일 일정 수정 시 폼에 데이터가 로드되지 않음
 - **해결 필요**: `handleEditClick` 로직 검증 필요
 
 ❌ **아니오 버튼 클릭 시 폼에 데이터가 로드되어야 함**
+
 - **원인**: '반복 설정' 체크박스를 찾을 수 없음
 - **분석**: 폼에 반복 설정 데이터가 로드되지 않음
 - **해결 필요**: `editEvent` 호출 후 폼 상태 확인 필요
 
 ❌ **반복 시리즈가 존재하지 않으면 404 에러를 처리해야 함**
+
 - **원인**: `expect.hasAssertions()` 제약
 - **분석**:
   - 에러 로그에서 `Error: Recurring series not found` 확인됨
@@ -327,6 +337,7 @@ const {
 **문제**: Material-UI Dialog의 closing animation으로 인해 테스트가 불안정
 
 **해결**:
+
 ```typescript
 TransitionProps={{ timeout: 0 }}
 ```
@@ -340,6 +351,7 @@ TransitionProps={{ timeout: 0 }}
 **문제**: ESLint에서 `any` 타입 사용 경고
 
 **해결**:
+
 ```typescript
 catch (error) {
   if (error instanceof Error && error.message === 'Recurring series not found') {
@@ -367,6 +379,7 @@ catch (error) {
 ### 즉시 해결 필요
 
 1. **단일 일정 수정 플로우 검증**
+
    - `handleEditClick`에서 단일 일정 수정 시 폼 로드 확인
    - `editEvent` 함수 호출 확인
 

@@ -20,6 +20,7 @@ type Agent = (handoff: HandoffDoc) => Artifact;
 ```
 
 **특징:**
+
 - 명확한 입력/출력 계약
 - 외부 의존성 없음
 - 재현 가능한 결과
@@ -37,6 +38,7 @@ Orchestrator → Handoff Document → Agent → Artifact → Orchestrator
 ### 3. 순수 함수 패러다임 (Pure Function Paradigm)
 
 에이전트는 순수 함수처럼 동작합니다:
+
 - 동일한 입력 → 동일한 출력
 - 부수 효과 없음 (파일 쓰기 제외)
 - 전역 상태 접근 금지
@@ -86,9 +88,11 @@ agent-docs/[agent-name]/
 ### 문서별 역할
 
 #### 1. contract.md (계약 명세서)
+
 **목적**: 입력/출력 계약 정의
 
 **포함 내용:**
+
 - 입력 계약 (Handoff 문서 형식)
 - 출력 계약 (산출물 형식)
 - 검증 기준
@@ -98,9 +102,11 @@ agent-docs/[agent-name]/
 **대상**: 시스템 설계자, Orchestrator
 
 #### 2. prompt.md (실행 매뉴얼)
+
 **목적**: 단계별 실행 가이드
 
 **포함 내용:**
+
 - Step-by-step 절차
 - 검증 명령어
 - Git 워크플로우
@@ -110,9 +116,11 @@ agent-docs/[agent-name]/
 **대상**: 에이전트 자신, 개발자
 
 #### 3. getting-started.md (사용자 가이드)
+
 **목적**: 빠른 시작 안내
 
 **포함 내용:**
+
 - 문서 읽기 순서
 - Quick Start
 - 실제 예시
@@ -126,13 +134,16 @@ agent-docs/[agent-name]/
 ## 에이전트별 역할
 
 ### Phase 0-6: orchestrator
+
 **역할**: 전체 파이프라인 조율
+
 - 6단계 TDD 파이프라인 관리
 - Phase 전환 및 검증
 - Git 브랜치 관리
 - 에러 복구 및 재시도
 
 **문서 위치**: [orchestrator/](orchestrator/)
+
 - [계약 명세](orchestrator/contract.md)
 - [실행 매뉴얼](orchestrator/prompt.md)
 - [사용자 가이드](orchestrator/getting-started.md)
@@ -140,7 +151,9 @@ agent-docs/[agent-name]/
 ---
 
 ### Phase 1: feature-designer
+
 **역할**: 요구사항 → 기술 명세
+
 - 요구사항 분석 및 명확화
 - 컴포넌트 아키텍처 설계
 - 데이터 흐름 설계
@@ -152,6 +165,7 @@ agent-docs/[agent-name]/
 **출력**: 기술 명세서 (spec.md)
 
 **문서 위치**: [feature-designer/](feature-designer/)
+
 - [계약 명세](feature-designer/contract.md)
 - [실행 매뉴얼](feature-designer/prompt.md)
 - [사용자 가이드](feature-designer/getting-started.md)
@@ -159,7 +173,9 @@ agent-docs/[agent-name]/
 ---
 
 ### Phase 2: test-designer
+
 **역할**: 기술 명세 → 테스트 전략
+
 - 테스트 케이스 식별 (단위/통합/E2E)
 - GWT 패턴 시나리오 작성
 - 목킹 전략 수립 (MSW, vi.mock)
@@ -170,6 +186,7 @@ agent-docs/[agent-name]/
 **출력**: 테스트 전략 (test-strategy.md)
 
 **문서 위치**: [test-designer/](test-designer/)
+
 - [계약 명세](test-designer/contract.md)
 - [실행 매뉴얼](test-designer/prompt.md)
 - [사용자 가이드](test-designer/getting-started.md)
@@ -177,7 +194,9 @@ agent-docs/[agent-name]/
 ---
 
 ### Phase 3: test-writer (RED)
+
 **역할**: 테스트 전략 → 실패하는 테스트
+
 - **구현 전에** 테스트 작성
 - Vitest + React Testing Library 사용
 - GWT 패턴 준수
@@ -186,11 +205,12 @@ agent-docs/[agent-name]/
 - 예상 실패 문서화
 
 **입력**: 테스트 전략 (test-strategy.md)
-**출력**: 실패하는 테스트 코드 (task.*.spec.ts)
+**출력**: 실패하는 테스트 코드 (task.\*.spec.ts)
 
 **중요**: 구현 코드 작성 금지!
 
 **문서 위치**: [test-writer/](test-writer/)
+
 - [계약 명세](test-writer/contract.md)
 - [실행 매뉴얼](test-writer/prompt.md)
 - [사용자 가이드](test-writer/getting-started.md)
@@ -198,7 +218,9 @@ agent-docs/[agent-name]/
 ---
 
 ### Phase 4: code-writer (GREEN)
+
 **역할**: 실패하는 테스트 → 통과하는 코드
+
 - **최소한의 구현**으로 테스트 통과
 - TypeScript/React 베스트 프랙티스
 - CLAUDE.md 컨벤션 준수
@@ -212,6 +234,7 @@ agent-docs/[agent-name]/
 **중요**: 테스트 파일 수정 금지!
 
 **문서 위치**: [code-writer/](code-writer/)
+
 - [계약 명세](code-writer/contract.md)
 - [실행 매뉴얼](code-writer/prompt.md)
 - [사용자 가이드](code-writer/getting-started.md)
@@ -219,7 +242,9 @@ agent-docs/[agent-name]/
 ---
 
 ### Phase 5: refactoring-expert (REFACTOR)
+
 **역할**: 동작하는 코드 → 품질 높은 코드
+
 - DRY 원칙 적용 (중복 제거)
 - React 최적화 (memo, useMemo, useCallback)
 - TypeScript 타입 강화 (any 제거)
@@ -233,21 +258,23 @@ agent-docs/[agent-name]/
 **중요**: 동작 변경 금지! (Behavior Preservation)
 
 **문서 위치**: [refactoring-expert/](refactoring-expert/)
+
 - [계약 명세](refactoring-expert/contract.md)
 - [실행 매뉴얼](refactoring-expert/prompt.md)
 - [사용자 가이드](refactoring-expert/getting-started.md)
-- [README](refactoring-expert/README.md)
 
 ---
 
 ## 공통 산출물
 
 ### State 추적
+
 **파일**: [orchestrator/state/current-state.json](orchestrator/state/current-state.json)
 
 **목적**: 진행 상황 추적
 
 **내용**:
+
 - 현재 Phase
 - Phase별 상태
 - Git 태그 정보
@@ -255,11 +282,13 @@ agent-docs/[agent-name]/
 - 검증 결과
 
 ### Issues 로그
+
 **파일**: [orchestrator/references/issues-log.md](orchestrator/references/issues-log.md)
 
 **목적**: 이슈 추적 및 관리
 
 **내용**:
+
 - 이슈 제목 및 설명
 - 발생 Phase
 - 근본 원인
@@ -346,6 +375,7 @@ git merge --no-ff feat/[feature-name]
 ### 커밋 메시지 규칙
 
 **형식**:
+
 ```
 Phase-N: [한글 제목]
 
@@ -355,6 +385,7 @@ Phase-N: [한글 제목]
 ```
 
 **특징**:
+
 - Prefix: 영문 PascalCase (`Phase-N:`)
 - 제목/본문: 한글
 - Claude 서명 제외 (일반 커밋과 구분)
@@ -366,20 +397,18 @@ Phase-N: [한글 제목]
 ### 처음 사용하는 경우
 
 **1단계: 전체 아키텍처 이해 (30분)**
+
 1. 이 README 읽기 (10분)
 2. [orchestrator/getting-started.md](orchestrator/getting-started.md) (20분)
 
-**2단계: 실행 준비 (15분)**
-3. [orchestrator/contract.md](orchestrator/contract.md) 훑어보기 (5분)
-4. [orchestrator/prompt.md](orchestrator/prompt.md) 필요 부분만 (10분)
+**2단계: 실행 준비 (15분)** 3. [orchestrator/contract.md](orchestrator/contract.md) 훑어보기 (5분) 4. [orchestrator/prompt.md](orchestrator/prompt.md) 필요 부분만 (10분)
 
-**3단계: 실행**
-5. Orchestrator 활성화
-6. 각 Phase별로 해당 에이전트 문서 참조
+**3단계: 실행** 5. Orchestrator 활성화 6. 각 Phase별로 해당 에이전트 문서 참조
 
 ### 특정 에이전트만 사용하는 경우
 
 **읽기 순서** (각 에이전트 공통):
+
 1. `[agent]/getting-started.md` - 빠른 시작 (10분)
 2. `[agent]/contract.md` - 계약 이해 (15분)
 3. `[agent]/prompt.md` - 실행 시 참조 (on-demand)
@@ -390,15 +419,15 @@ Phase-N: [한글 제목]
 
 ### Phase별 성공 기준
 
-| Phase | 에이전트 | 필수 검증 | 명령어 |
-|-------|----------|----------|--------|
-| 0 | orchestrator | 계획 수립 완료 | - |
-| 1 | feature-designer | 명세서 완성 | `ls logs/spec.md` |
-| 2 | test-designer | 테스트 전략 수립 | `ls logs/test-strategy.md` |
-| 3 | test-writer | **테스트 실패** | `pnpm test` (실패해야 함) |
-| 4 | code-writer | **테스트 통과** | `pnpm test` (통과해야 함) |
-| 5 | refactoring-expert | **테스트 여전히 통과** | `pnpm test && pnpm lint` |
-| 6 | orchestrator | **빌드 성공** | `pnpm build` |
+| Phase | 에이전트           | 필수 검증              | 명령어                     |
+| ----- | ------------------ | ---------------------- | -------------------------- |
+| 0     | orchestrator       | 계획 수립 완료         | -                          |
+| 1     | feature-designer   | 명세서 완성            | `ls logs/spec.md`          |
+| 2     | test-designer      | 테스트 전략 수립       | `ls logs/test-strategy.md` |
+| 3     | test-writer        | **테스트 실패**        | `pnpm test` (실패해야 함)  |
+| 4     | code-writer        | **테스트 통과**        | `pnpm test` (통과해야 함)  |
+| 5     | refactoring-expert | **테스트 여전히 통과** | `pnpm test && pnpm lint`   |
+| 6     | orchestrator       | **빌드 성공**          | `pnpm build`               |
 
 ### 전체 성공 기준
 
@@ -419,6 +448,7 @@ Phase-N: [한글 제목]
 **증상**: Phase N의 검증 기준 미충족
 
 **조치**:
+
 1. Phase N-1로 롤백 (`git reset --hard phase-(N-1)-tag`)
 2. 문제 분석 (issues-log.md에 기록)
 3. Handoff 문서 개선
@@ -429,6 +459,7 @@ Phase-N: [한글 제목]
 **증상**: 에이전트가 다른 Phase 산출물 접근 시도
 
 **조치**:
+
 1. 접근 거부
 2. 문제 기록
 3. Handoff 문서에 필요 정보 추가
@@ -439,6 +470,7 @@ Phase-N: [한글 제목]
 **증상**: main 브랜치 변경으로 충돌 발생
 
 **조치**:
+
 1. Feature 브랜치에서 main 병합 (`git merge main`)
 2. 충돌 해결
 3. Phase 6 재검증
@@ -448,12 +480,14 @@ Phase-N: [한글 제목]
 ## 참고 자료
 
 ### 프로젝트 문서
+
 - [CLAUDE.md](../../CLAUDE.md) - 프로젝트 규칙
 - [folder-tree.md](../docs/folder-tree.md) - 프로젝트 구조
 - [git-commit-convention.md](../docs/git-commit-convention.md) - 커밋 규칙
 - [rule-of-make-good-test.md](../docs/rule-of-make-good-test.md) - 테스트 철학
 
 ### 에이전트 정의
+
 - [orchestrator.md](../agents/orchestrator.md)
 - [feature-designer.md](../agents/feature-designer.md)
 - [test-designer.md](../agents/test-designer.md)
@@ -476,6 +510,7 @@ Phase-N: [한글 제목]
 ## 변경 이력
 
 ### v1.0.0 (2025-10-30)
+
 - 초기 아키텍처 문서 작성
 - 6개 에이전트 문서 완성 (orchestrator, feature-designer, test-designer, test-writer, code-writer, refactoring-expert)
 - Handoff 프로토콜 정의

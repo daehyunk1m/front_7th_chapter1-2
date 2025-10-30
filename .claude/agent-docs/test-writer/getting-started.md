@@ -100,7 +100,7 @@ pnpm test task.[feature-name].spec.ts
 ### Step 4: 로그 작성 (1분 30초)
 
 ```markdown
-# .claude/agent-docs/test-writer/logs/red-phase-result.md
+# .claude/agent-docs/test-writer/logs/YYYY-MM-DD_test-writing-log.md
 
 ## 실행 결과
 
@@ -271,7 +271,7 @@ src/__tests__/
 #### RED 단계 로그 파일
 
 ```markdown
-# .claude/agent-docs/test-writer/logs/red-phase-result.md
+# .claude/agent-docs/test-writer/logs/YYYY-MM-DD_test-writing-log.md
 
 ## 실행 명령어
 
@@ -819,7 +819,7 @@ cat src/__tests__/medium.integration.spec.ts
 
 3. **로그 파일 작성**
    ```bash
-   cat .claude/agent-docs/test-writer/logs/red-phase-result.md
+   cat .claude/agent-docs/test-writer/logs/YYYY-MM-DD_test-writing-log.md
    ```
 
 4. **Orchestrator에게 보고**

@@ -104,7 +104,7 @@ pnpm test task.repeat-event.spec.ts
 
 ```bash
 # 리팩터링 보고서 작성
-cat > .claude/agent-docs/refactoring-expert/logs/refactor-report.md
+cat > .claude/agent-docs/refactoring-expert/logs/YYYY-MM-DD_refactoring-log.md
 ```
 
 **필수 섹션:**

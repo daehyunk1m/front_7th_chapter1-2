@@ -18,6 +18,7 @@
 Test Writer는 **Phase 3 (RED)**에서 동작하며, 테스트 전략을 실제 실패하는 테스트 코드로 변환하는 역할을 수행한다.
 
 **핵심 책임:**
+
 - 테스트 전략을 실행 가능한 테스트 코드로 변환
 - GWT 패턴 기반 테스트 작성
 - MSW를 이용한 API 모킹 설정
@@ -25,11 +26,13 @@ Test Writer는 **Phase 3 (RED)**에서 동작하며, 테스트 전략을 실제 
 - 예상 실패 내용 문서화
 
 **선행 조건:**
+
 - Phase 2 (Test Design)이 완료되어야 함
 - Test Designer가 생성한 테스트 전략 문서가 존재해야 함
 - Orchestrator가 생성한 Handoff 문서가 존재해야 함
 
 **후속 단계:**
+
 - Phase 4 (GREEN - Code Writing)로 전달
 - Code Writer가 이 테스트를 통과시키는 구현 작성
 
@@ -113,20 +116,22 @@ Phase 1에서 Feature Designer가 생성한 기술 명세서:
 
 ```typescript
 {
-  type_definitions: TypeScript;     // 타입 정의
-  api_design: APISpec;              // API 설계
-  component_structure: Component;   // 컴포넌트 구조
+  type_definitions: TypeScript; // 타입 정의
+  api_design: APISpec; // API 설계
+  component_structure: Component; // 컴포넌트 구조
 }
 ```
 
 #### 3. context_files (필수)
 
 최소 포함 파일:
+
 - `CLAUDE.md` - 프로젝트 규칙 및 테스트 컨벤션
 - `src/types.ts` - 타입 정의
 - `src/__mocks__/handlers.ts` - MSW 핸들러 패턴
 
 선택 파일:
+
 - 기존 테스트 파일 (패턴 참고용)
 - Mock 데이터 파일 (`src/__mocks__/response/*.json`)
 
@@ -141,6 +146,7 @@ src/__tests__/task.[feature-name].spec.ts
 ```
 
 **파일명 규칙:**
+
 - 새 테스트: `task.[feature-name].spec.ts`
 - 예: `task.repeat-event.spec.ts`, `task.category-filter.spec.ts`
 
@@ -228,22 +234,24 @@ describe('[API 통신 - 한글]', () => {
 #### RED 단계 실행 로그
 
 ```
-.claude/agent-docs/test-writer/logs/red-phase-result.md
+.claude/agent-docs/test-writer/logs/YYYY-MM-DD_test-writing-log.md
 ```
 
 **내용:**
-```markdown
+
+````markdown
 # TDD RED 단계 실행 결과
 
 작성일: [YYYY-MM-DD]
 기능: [기능명]
-테스트 파일: src/__tests__/task.[feature-name].spec.ts
+테스트 파일: src/**tests**/task.[feature-name].spec.ts
 
 ## 실행 명령어
 
 ```bash
 pnpm test task.[feature-name].spec.ts
 ```
+````
 
 ## 실행 결과
 
@@ -269,7 +277,8 @@ Test Files  1 failed (1)
 - ✅ 실패 메시지가 명확함
 - ✅ 구현 코드는 작성하지 않음
 - ✅ GREEN 단계로 전달 준비 완료
-```
+
+````
 
 ---
 
@@ -315,7 +324,7 @@ Test Files  1 failed (1)
 
 ```bash
 ls -la src/__tests__/task.*.spec.ts
-```
+````
 
 #### 2. 테스트 실행 (반드시 실패해야 함)
 
@@ -324,6 +333,7 @@ pnpm test task.[feature-name].spec.ts
 ```
 
 **예상 출력:**
+
 ```
 FAIL  src/__tests__/task.[feature-name].spec.ts
   ✗ 여러 테스트들이 실패
@@ -333,6 +343,7 @@ Test Files  1 failed (1)
 ```
 
 **❌ 만약 테스트가 통과하면:**
+
 - RED 단계 실패 (구현이 이미 있거나 테스트가 잘못됨)
 - 테스트를 수정하거나 구현 코드 제거 필요
 
@@ -355,19 +366,23 @@ grep -E "(Given|When|Then)" src/__tests__/task.[feature-name].spec.ts
 ### 품질 기준
 
 **명확성 (Clarity)**
+
 - ❌ "테스트 1"
 - ✅ "초기 반복 유형은 none이어야 한다"
 
 **실패 메시지 유용성**
+
 - ❌ "테스트 실패"
 - ✅ "TypeError: Cannot read property 'repeatType' of undefined"
 
 **테스트 독립성**
+
 - 각 테스트는 독립적으로 실행 가능
 - 테스트 순서에 의존하지 않음
 - 공유 상태 사용 최소화
 
 **완전성 (Completeness)**
+
 - 모든 핵심 동작 테스트
 - 엣지 케이스 포함
 - 에러 시나리오 포함
@@ -381,11 +396,13 @@ grep -E "(Given|When|Then)" src/__tests__/task.[feature-name].spec.ts
 #### 1. 구현이 없어야 한다
 
 **금지:**
+
 - ❌ 프로덕션 코드 작성
 - ❌ 훅, 유틸, 컴포넌트 구현
 - ❌ 타입 정의 활성화 (주석 처리된 것)
 
 **허용:**
+
 - ✅ 테스트 코드만 작성
 - ✅ Mock 데이터 생성
 - ✅ 테스트 헬퍼 함수 작성
@@ -393,6 +410,7 @@ grep -E "(Given|When|Then)" src/__tests__/task.[feature-name].spec.ts
 #### 2. 테스트는 반드시 실패해야 한다
 
 **검증 방법:**
+
 ```bash
 pnpm test task.[feature-name].spec.ts
 
@@ -401,6 +419,7 @@ pnpm test task.[feature-name].spec.ts
 ```
 
 **실패하지 않으면:**
+
 1. 구현이 이미 있는지 확인
 2. 테스트가 실제로 동작을 검증하는지 확인
 3. import 경로가 올바른지 확인
@@ -408,6 +427,7 @@ pnpm test task.[feature-name].spec.ts
 #### 3. 실패 메시지는 명확해야 한다
 
 **좋은 실패 메시지:**
+
 ```
 TypeError: Cannot read property 'repeatType' of undefined
 ReferenceError: setRepeatType is not a function
@@ -417,6 +437,7 @@ expect(received).toBe(expected)
 ```
 
 **나쁜 실패 메시지:**
+
 ```
 Error: Test failed
 Assertion failed
@@ -426,6 +447,7 @@ undefined is not an object
 #### 4. 예상 실패 내용 문서화
 
 **테스트 파일 상단:**
+
 ```typescript
 /**
  * TDD RED 단계 테스트
@@ -439,7 +461,7 @@ undefined is not an object
 ```
 
 **로그 파일:**
-`.claude/agent-docs/test-writer/logs/red-phase-result.md`
+`.claude/agent-docs/test-writer/logs/YYYY-MM-DD_test-writing-log.md`
 
 ### RED 단계 검증 절차
 
@@ -458,7 +480,7 @@ pnpm test task.[feature-name].spec.ts
 
 #### Step 3: 실패 결과 캡처
 
-실행 결과를 `logs/red-phase-result.md`에 기록
+실행 결과를 `logs/YYYY-MM-DD_test-writing-log.md`에 기록
 
 #### Step 4: 검증 완료
 
@@ -490,7 +512,7 @@ previous_phase: 3
 inputs:
   test_file: src/__tests__/task.[feature-name].spec.ts
   feature_spec: .claude/agent-docs/feature-designer/logs/spec.md
-  red_phase_log: .claude/agent-docs/test-writer/logs/red-phase-result.md
+  red_phase_log: .claude/agent-docs/test-writer/logs/YYYY-MM-DD_test-writing-log.md
   context_files:
     - CLAUDE.md
     - src/types.ts
@@ -528,6 +550,7 @@ validation_criteria:
 ### Test Writer가 할 수 있는 것
 
 ✅ **허용:**
+
 - Handoff 문서 읽기
 - test-writer.md 참조
 - CLAUDE.md 읽기
@@ -537,11 +560,12 @@ validation_criteria:
 - Mock 데이터 파일 참조
 - 테스트 파일 작성 (`src/__tests__/task.*.spec.ts`)
 - Mock 헬퍼 작성 (`src/__mocks__/`)
-- 로그 파일 작성 (`logs/red-phase-result.md`)
+- 로그 파일 작성 (`logs/YYYY-MM-DD_test-writing-log.md`)
 
 ### Test Writer가 할 수 없는 것
 
 ❌ **금지:**
+
 - 프로덕션 코드 작성 (src/hooks/, src/utils/, src/components/)
 - 타입 정의 활성화 (src/types.ts 수정)
 - 다른 Phase의 Handoff 문서 읽기
@@ -571,20 +595,24 @@ type TestWriter = (testStrategy: TestStrategy, spec: FeatureSpec) => FailingTest
 **상황:** Handoff 문서 또는 테스트 전략이 불완전함
 
 **조치:**
+
 1. 누락된 항목 명확히 기록
 2. `references/issues-log.md`에 문제 기록
 3. Orchestrator에게 보고
 
 **예시:**
+
 ```markdown
 ## ⚠️ 입력 검증 실패
 
 ### 누락 항목
+
 - [ ] 테스트 전략에 엣지 케이스 미정의
 - [ ] API 모킹 계획 불명확
 - [ ] GWT 시나리오 불완전
 
 ### 필요한 정보
+
 1. API 엔드포인트 모킹 시 어떤 응답을 반환해야 하는가?
 2. 엣지 케이스로 어떤 상황을 테스트해야 하는가?
 ```
@@ -594,15 +622,18 @@ type TestWriter = (testStrategy: TestStrategy, spec: FeatureSpec) => FailingTest
 **상황:** 테스트 시나리오가 명확하지 않음
 
 **조치:**
+
 1. 가능한 해석 나열
 2. 가장 일반적인 케이스로 작성
 3. 질문 사항 기록
 
 **예시:**
+
 ```markdown
 ## 🤔 명확화 필요
 
 ### 질문 1: "반복 일정 생성" 동작
+
 **현재 이해:** 단일 이벤트 생성 후 반복 정보 포함
 **불명확한 점:** 여러 이벤트를 한 번에 생성하는가?
 **현재 구현:** 단일 이벤트 생성으로 가정
@@ -613,19 +644,23 @@ type TestWriter = (testStrategy: TestStrategy, spec: FeatureSpec) => FailingTest
 **상황:** 테스트가 기존 코드와 충돌
 
 **조치:**
+
 1. 충돌 지점 명시
 2. 기존 코드 수정 필요 여부 평가
 3. Orchestrator에게 보고
 
 **예시:**
+
 ```markdown
 ## ⚠️ 기존 코드 충돌
 
 ### 문제
+
 현재 Event 타입에 repeat 필드가 주석 처리됨.
 테스트를 작성하려면 활성화 필요.
 
 ### 조치
+
 Phase 4 (Code Writer)에서 타입 활성화 필요.
 현재는 주석으로 표시하고 진행.
 ```
@@ -642,7 +677,7 @@ src/__tests__/
 
 .claude/agent-docs/test-writer/
 ├── logs/
-│   └── red-phase-result.md            # RED 단계 실행 결과 (필수)
+│   └── YYYY-MM-DD_test-writing-log.md # RED 단계 실행 결과 (필수)
 │
 └── references/
     ├── issues-log.md                  # 문제 기록 (필요 시)
@@ -655,18 +690,19 @@ src/__tests__/
 
 ### RED 단계 로그 템플릿
 
-```markdown
+````markdown
 # TDD RED 단계 실행 결과
 
 작성일: [YYYY-MM-DD]
 기능: [기능명]
-테스트 파일: src/__tests__/task.[feature-name].spec.ts
+테스트 파일: src/**tests**/task.[feature-name].spec.ts
 
 ## 실행 명령어
 
 ```bash
 pnpm test task.[feature-name].spec.ts
 ```
+````
 
 ## 실행 결과
 
@@ -682,7 +718,8 @@ pnpm test task.[feature-name].spec.ts
 ## 다음 단계
 
 Phase 4 (GREEN - Code Writer)에서 이 테스트를 통과시키는 구현 작성.
-```
+
+````
 
 ---
 
@@ -748,9 +785,10 @@ describe('useEventForm - 반복 유형 관리', () => {
     expect(result.current.repeatType).toBe('weekly');
   });
 });
-```
+````
 
 **왜 좋은가:**
+
 - ✅ 명확한 예상 실패 문서화
 - ✅ GWT 패턴 엄수
 - ✅ 한글 설명 명확

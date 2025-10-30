@@ -450,7 +450,7 @@ Test Files  1 failed (1)
 
 #### 6.2 실패 결과 기록
 
-실행 결과를 복사하여 `logs/red-phase-result.md`에 기록:
+실행 결과를 복사하여 `logs/YYYY-MM-DD_test-writing-log.md`에 기록:
 
 ```markdown
 # TDD RED 단계 실행 결과
@@ -546,7 +546,7 @@ interface UseEventFormReturn {
 ls src/__tests__/task.*.spec.ts
 
 # 로그 파일 확인
-ls .claude/agent-docs/test-writer/logs/red-phase-result.md
+ls .claude/agent-docs/test-writer/logs/YYYY-MM-DD_test-writing-log.md
 ```
 
 ### Step 9: Phase 완료 보고
@@ -558,7 +558,7 @@ Orchestrator에게 완료 보고:
 
 ### 산출물
 - ✅ 테스트 파일: src/__tests__/task.[feature-name].spec.ts
-- ✅ RED 단계 로그: logs/red-phase-result.md
+- ✅ RED 단계 로그: logs/YYYY-MM-DD_test-writing-log.md
 
 ### 검증 결과
 - ✅ 모든 테스트 실패 확인 (예상된 결과)
@@ -1207,7 +1207,7 @@ grep -E "(describe|it)\(" src/__tests__/task.[feature-name].spec.ts
 #### 6. 로그 파일 확인
 
 ```bash
-cat .claude/agent-docs/test-writer/logs/red-phase-result.md
+cat .claude/agent-docs/test-writer/logs/YYYY-MM-DD_test-writing-log.md
 ```
 
 ### 검증 체크리스트
