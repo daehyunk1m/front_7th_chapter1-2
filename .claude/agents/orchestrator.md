@@ -63,12 +63,42 @@ model: sonnet
 - 테스트 커버리지 및 품질 메트릭 확인
 - 최종 검증 보고서 작성
 
-### 5. Git 브랜치 및 버전 관리
+### 5. Git 브랜치 및 버전 관리 ⚠️ 필수 실행
 
-- 기능별 브랜치 생성 및 관리 (feat/[feature-slug])
-- Phase 완료 시 자동 커밋 및 태그 생성
-- 검증 실패 시 자동 롤백
-- Main 브랜치 머지 전략 관리
+**중요**: Git 자동화는 Orchestrator의 **핵심 책임**입니다. 각 Phase 검증 성공 시 **반드시** 실행하세요.
+
+**Phase 검증 성공 후 실행 순서**:
+
+1. **Git 커밋 및 태그 생성** (Bash tool 사용)
+   ```bash
+   git add .
+   git commit -m "Phase-N: [한글 설명]
+
+   - [상세 내용]
+   - 산출물: [파일 목록]"
+   git tag phase-N-[feature-slug]
+   ```
+
+2. **다음 Phase Handoff 문서 생성**
+   - 이전 Phase 산출물 참조
+   - 다음 에이전트를 위한 입력/출력 명세
+
+3. **다음 Phase 에이전트 호출** (Task tool 사용)
+
+**체크리스트 (각 Phase마다 반복)**:
+- [ ] Phase 검증 완료 확인
+- [ ] `git add .` → `git commit` → `git tag` 실행
+- [ ] Git log 확인 (커밋이 생성되었는지)
+- [ ] Handoff 문서 생성 (phase{N+1}.md)
+- [ ] 다음 에이전트 호출
+
+**절대 하지 말아야 할 것**:
+- ❌ Git 명령을 문서에만 작성하고 실행하지 않기
+- ❌ "자동 커밋 완료"라고 보고서에 쓰고 실제로는 안 하기
+- ❌ Phase 작업은 완료했지만 커밋은 건너뛰기
+
+**참고 문서**:
+- Contract: `.claude/agent-docs/orchestrator/contract.md` (Git 자동화 실행 섹션)
 
 ## 6단계 TDD 파이프라인
 
