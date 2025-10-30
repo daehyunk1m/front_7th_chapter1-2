@@ -1,3 +1,56 @@
+---
+phase: 2
+agent: test-designer
+timestamp: 2025-10-30T22:05:00Z
+status: ready
+previous_phase: 1
+
+inputs:
+  requirement: "반복 일정 수정 기능의 테스트 시나리오 및 케이스 설계"
+  context_files:
+    - ./phase0-plan.md
+    - .claude/agent-docs/feature-designer/logs/spec.md
+    - /Users/daehyun/Desktop/hh99_fe_7th/front_7th_chapter1-2/src/__tests__/
+    - /Users/daehyun/Desktop/hh99_fe_7th/front_7th_chapter1-2/src/__mocks__/handlers.ts
+
+references:
+  agent_definition: ../../agents/test-designer.md
+  agent_prompt: ../test-designer/prompt.md
+  shared_docs:
+    - ../../docs/folder-tree.md
+    - ../../docs/rule-of-make-good-test.md
+
+output_requirements:
+  path: .claude/agent-docs/test-designer/logs/test-strategy.md
+  required_sections:
+    - 테스트 전략
+    - 테스트 시나리오
+    - 에러 케이스
+    - 엣지 케이스
+    - MSW 핸들러 설계
+    - 테스트 데이터
+    - 테스트 케이스 목록
+    - 참고 사항
+  format: markdown
+
+constraints:
+  - Vitest + @testing-library/react 사용
+  - MSW로 API 모킹
+  - GWT 패턴 준수
+  - 파일명: task.recurring-edit.spec.tsx
+  - 접근성 테스트 포함
+
+validation_criteria:
+  - 모든 주요 시나리오 테스트 케이스 작성 (5개)
+  - 에러 케이스 테스트 케이스 작성 (3개)
+  - 엣지 케이스 테스트 케이스 작성 (3개)
+  - MSW 핸들러 전략 작성 (3개 API)
+  - 테스트 데이터 설계 완료
+  - GWT 패턴 적용 방법 명시
+  - 접근성 테스트 전략 포함
+  - 기존 테스트 파일 분석 완료
+---
+
 # Phase 2 Handoff: Test Design
 
 ## 에이전트 정보
@@ -14,12 +67,12 @@
 
 ### 입력 산출물
 - [계획 문서](./phase0-plan.md)
-- [기능 설계](../docs/feature-design.md)
+- [기능 설계](.claude/agent-docs/feature-designer/logs/spec.md)
 - 기존 테스트: `/Users/daehyun/Desktop/hh99_fe_7th/front_7th_chapter1-2/src/__tests__/`
 - MSW 핸들러: `/Users/daehyun/Desktop/hh99_fe_7th/front_7th_chapter1-2/src/__mocks__/handlers.ts`
 
 ### 출력 산출물
-`/Users/daehyun/Desktop/hh99_fe_7th/front_7th_chapter1-2/docs/test-design.md` 파일 생성
+`.claude/agent-docs/test-designer/logs/test-strategy.md` 파일 생성
 
 ---
 
@@ -225,7 +278,7 @@ describe('반복 일정 수정 다이얼로그', () => {
 
 ## 출력 형식
 
-### docs/test-design.md 구조
+### .claude/agent-docs/test-designer/logs/test-strategy.md 구조
 
 ```markdown
 # 반복 일정 수정 기능 테스트 설계
@@ -288,7 +341,7 @@ describe('반복 일정 수정 다이얼로그', () => {
 ## 다음 Phase
 
 Phase 3로 전달할 내용:
-- `docs/test-design.md` (이번 Phase 산출물)
+- `.claude/agent-docs/test-designer/logs/test-strategy.md` (이번 Phase 산출물)
 - 테스트 케이스 구현 가이드
 - MSW 핸들러 확장 가이드
 

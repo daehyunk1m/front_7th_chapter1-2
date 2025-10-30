@@ -235,6 +235,531 @@ Orchestrator는 **Task tool**을 사용하여 다른 에이전트를 호출합�
 
 ---
 
+## 📊 상태 관리 (current-state.json)
+
+### 상태 파일 구조
+
+**경로**: `.claude/agent-docs/orchestrator/state/current-state.json`
+
+```json
+{
+  "session_id": "YYYY-MM-DD_[feature-slug]",
+  "feature_name": "[기능 설명]",
+  "branch_name": "feat/[feature-slug]",
+  "current_phase": 0,
+  "phase_status": "in_progress",
+  "phases": {
+    "0": {
+      "name": "Planning",
+      "status": "in_progress",
+      "agent": "orchestrator",
+      "started_at": "2025-10-30T10:00:00Z",
+      "artifacts": []
+    },
+    "1": {
+      "name": "Feature Design",
+      "status": "pending",
+      "agent": "feature-designer"
+    },
+    "2": {
+      "name": "Test Design",
+      "status": "pending",
+      "agent": "test-designer"
+    },
+    "3": {
+      "name": "RED - Test Writing",
+      "status": "pending",
+      "agent": "test-writer"
+    },
+    "4": {
+      "name": "GREEN - Implementation",
+      "status": "pending",
+      "agent": "code-writer"
+    },
+    "5": {
+      "name": "REFACTOR",
+      "status": "pending",
+      "agent": "refactoring-expert"
+    },
+    "6": {
+      "name": "VALIDATE",
+      "status": "pending",
+      "agent": "orchestrator"
+    }
+  },
+  "git": {
+    "base_branch": "main",
+    "feature_branch": "feat/[feature-slug]",
+    "tags": []
+  },
+  "metadata": {
+    "created_at": "2025-10-30T10:00:00Z",
+    "last_updated": "2025-10-30T10:00:00Z"
+  }
+}
+```
+
+### 상태 업데이트 타이밍
+
+#### Phase 시작 시
+
+Write tool을 사용하여 상태를 업데이트합니다:
+
+```json
+{
+  "current_phase": 1,
+  "phase_status": "in_progress",
+  "phases": {
+    "1": {
+      "name": "Feature Design",
+      "status": "in_progress",
+      "agent": "feature-designer",
+      "started_at": "2025-10-30T10:15:00Z",
+      "artifacts": []
+    }
+  },
+  "metadata": {
+    "last_updated": "2025-10-30T10:15:00Z"
+  }
+}
+```
+
+#### Phase 완료 시
+
+산출물 경로를 기록하고 상태를 completed로 변경:
+
+```json
+{
+  "current_phase": 1,
+  "phase_status": "completed",
+  "phases": {
+    "1": {
+      "name": "Feature Design",
+      "status": "completed",
+      "agent": "feature-designer",
+      "started_at": "2025-10-30T10:15:00Z",
+      "completed_at": "2025-10-30T11:00:00Z",
+      "artifacts": [
+        ".claude/agent-docs/feature-designer/logs/spec.md"
+      ]
+    }
+  },
+  "git": {
+    "tags": ["phase-1-feature-slug"]
+  },
+  "metadata": {
+    "last_updated": "2025-10-30T11:00:00Z"
+  }
+}
+```
+
+#### Phase 실패 시
+
+에러 정보를 기록하고 retry_count 증가:
+
+```json
+{
+  "current_phase": 3,
+  "phase_status": "failed",
+  "phases": {
+    "3": {
+      "name": "RED - Test Writing",
+      "status": "failed",
+      "agent": "test-writer",
+      "started_at": "2025-10-30T12:00:00Z",
+      "failed_at": "2025-10-30T12:30:00Z",
+      "error": "테스트 파일 생성 실패",
+      "retry_count": 1
+    }
+  },
+  "metadata": {
+    "last_updated": "2025-10-30T12:30:00Z"
+  }
+}
+```
+
+### Write Tool 사용 예시
+
+```typescript
+// Phase 시작 시
+await write({
+  file_path: ".claude/agent-docs/orchestrator/state/current-state.json",
+  content: JSON.stringify(updatedState, null, 2)
+});
+```
+
+---
+
+## 🔄 Phase 전환 프로세스
+
+각 Phase 완료 후 다음 순서를 **반드시** 따르세요:
+
+### 4단계 Phase 전환 절차
+
+#### 1단계: Phase 검증
+
+**검증 항목**:
+- [ ] 산출물 파일이 존재하는가?
+- [ ] 필수 섹션이 모두 포함되어 있는가?
+- [ ] 검증 기준을 충족하는가?
+- [ ] 테스트가 있는 경우, 예상대로 실패하거나 통과하는가?
+
+**검증 명령어**:
+```bash
+# Phase 3 (RED): 테스트가 실패해야 함
+pnpm test [test-file]
+
+# Phase 4 (GREEN): 테스트가 통과해야 함
+pnpm test
+
+# TypeScript 컴파일
+pnpm lint:tsc
+
+# ESLint
+pnpm lint:eslint
+```
+
+#### 2단계: Git 커밋 및 태그 (Bash tool 사용)
+
+**순서**:
+1. 파일 추가
+2. 커밋 메시지 작성 (한글, 상세)
+3. 태그 생성
+
+**Bash tool 예시**:
+```bash
+git add .
+git commit -m "Phase-N: [한글 기능 설명] [Phase 이름] 완료
+
+- 산출물: [파일 경로]
+- 검증: [테스트 결과]
+- 상태: [완료 상태]"
+git tag phase-N-[feature-slug]
+```
+
+**주의사항**:
+- ❌ 커밋하지 않고 다음 Phase로 넘어가지 말 것
+- ❌ 태그를 생략하지 말 것
+- ✅ Git log로 커밋 확인
+
+#### 3단계: 상태 업데이트 (Write tool 사용)
+
+**current-state.json 업데이트**:
+1. 현재 Phase status를 "completed"로 변경
+2. completed_at 타임스탬프 추가
+3. artifacts 배열에 산출물 경로 추가
+4. git.tags 배열에 태그 추가
+5. metadata.last_updated 업데이트
+
+**Write tool 예시**:
+```typescript
+const updatedState = {
+  ...currentState,
+  current_phase: N,
+  phase_status: "completed",
+  phases: {
+    ...currentState.phases,
+    [N]: {
+      ...currentState.phases[N],
+      status: "completed",
+      completed_at: new Date().toISOString(),
+      artifacts: ["[산출물 경로]"]
+    }
+  },
+  git: {
+    ...currentState.git,
+    tags: [...currentState.git.tags, `phase-${N}-[feature-slug]`]
+  },
+  metadata: {
+    ...currentState.metadata,
+    last_updated: new Date().toISOString()
+  }
+};
+
+await write({
+  file_path: ".claude/agent-docs/orchestrator/state/current-state.json",
+  content: JSON.stringify(updatedState, null, 2)
+});
+```
+
+#### 4단계: 다음 Phase Handoff 생성 (Write tool 사용)
+
+**Handoff 문서 경로**: `.claude/agent-docs/orchestrator/handoff/phase{N+1}.md`
+
+**YAML frontmatter 포함**:
+```yaml
+---
+phase: N+1
+agent: [agent-name]
+timestamp: 2025-10-30T10:00:00Z
+status: ready
+previous_phase: N
+
+inputs:
+  requirement: "[작업 내용]"
+  context_files:
+    - ./phase0-plan.md
+    - [이전 Phase 산출물]
+
+references:
+  agent_definition: ../../agents/[agent-name].md
+  agent_prompt: ../[agent-name]/prompt.md
+  shared_docs:
+    - ../../docs/folder-tree.md
+
+output_requirements:
+  path: .claude/agent-docs/[agent-name]/logs/[output-file].md
+  required_sections:
+    - [섹션 목록]
+  format: markdown
+
+constraints:
+  - [제약 조건]
+
+validation_criteria:
+  - [검증 기준]
+---
+
+# Phase N+1 Handoff: [Phase 이름]
+
+## 에이전트 정보
+**수신자**: [agent-name]
+**발신자**: orchestrator
+**Phase**: N+1/6 - [Phase 이름]
+**생성일**: 2025-10-30
+
+---
+
+## 작업 목표
+
+[작업 목표 설명]
+
+### 입력 산출물
+- [이전 Phase 산출물 목록]
+
+### 출력 산출물
+[예상 산출물 경로]
+
+---
+
+## 요구사항
+
+[상세 요구사항]
+
+---
+
+## 제약 조건
+
+[제약 조건]
+
+---
+
+## 검증 체크리스트
+
+- [ ] [검증 항목 1]
+- [ ] [검증 항목 2]
+
+---
+
+## 다음 Phase
+
+Phase N+2로 전달할 내용:
+- [산출물]
+
+**다음 에이전트**: [next-agent-name]
+**다음 작업**: [next-phase-name]
+
+---
+
+**생성자**: orchestrator
+**최종 수정**: 2025-10-30
+```
+
+#### 5단계: 다음 에이전트 호출 (Task tool 사용)
+
+**Task tool 사용**:
+```typescript
+<uses Task tool to launch [agent-name] agent with:
+  - subagent_type: "[agent-name]"
+  - prompt: "당신은 [agent-name]입니다.
+
+             Handoff 문서를 읽고 작업하세요:
+             - 경로: .claude/agent-docs/orchestrator/handoff/phase{N+1}.md
+
+             이전 Phase의 컨텍스트는 접근할 수 없습니다.
+             Handoff에 명시된 입력만 사용하세요.
+
+             완료 후 산출물을 생성하고 로그를 작성하세요."
+>
+```
+
+---
+
+## ⚠️ Phase 검증 실패 시 조치
+
+### 1단계: 실패 감지
+
+**실패 케이스**:
+- ❌ 산출물 파일 없음
+- ❌ 필수 섹션 누락
+- ❌ 테스트 실패 (GREEN/REFACTOR 단계)
+- ❌ TypeScript 컴파일 오류
+- ❌ ESLint 오류
+
+### 2단계: 즉시 조치
+
+#### Git 롤백 (Bash tool)
+
+```bash
+# 현재 Phase의 커밋 취소
+git reset --hard phase-{N-1}-[feature-slug]
+
+# 실패한 태그 제거
+git tag -d phase-N-[feature-slug]
+
+# 확인
+git log --oneline --decorate
+```
+
+#### issues-log.md 기록 (Write tool)
+
+**경로**: `.claude/agent-docs/orchestrator/references/issues-log.md`
+
+```markdown
+## Phase N 검증 실패
+
+**시각**: 2025-10-30T12:30:00Z
+**Phase**: N - [Phase 이름]
+**에이전트**: [agent-name]
+
+### 원인
+[상세한 실패 원인]
+
+### 재시도 횟수
+X/3
+
+### 해결 방안
+[다음 시도에서 개선할 사항]
+
+---
+```
+
+#### 상태 업데이트 (Write tool)
+
+```json
+{
+  "current_phase": N,
+  "phase_status": "failed",
+  "phases": {
+    "N": {
+      "status": "failed",
+      "failed_at": "2025-10-30T12:30:00Z",
+      "error": "[에러 메시지]",
+      "retry_count": 1
+    }
+  }
+}
+```
+
+### 3단계: 재시도 전략
+
+**재시도 규칙**:
+- 최대 3회 재시도
+- Handoff 문서 개선 (더 명확한 요구사항, 예시 추가)
+- 3회 실패 시 사용자에게 보고 및 수동 개입 요청
+
+**Handoff 개선 체크리스트**:
+- [ ] 요구사항이 충분히 구체적인가?
+- [ ] 예시 코드가 포함되어 있는가?
+- [ ] 참조 파일이 올바른가?
+- [ ] 검증 기준이 명확한가?
+
+### 4단계: 3회 실패 시
+
+```markdown
+## 사용자 보고
+
+Phase N ([Phase 이름])이 3회 연속 실패했습니다.
+
+**실패 원인**:
+- [원인 1]
+- [원인 2]
+
+**시도한 해결 방법**:
+- [방법 1]
+- [방법 2]
+
+**권장 사항**:
+1. [수동 작업 1]
+2. [수동 작업 2]
+3. issues-log.md 확인
+
+수동으로 문제를 해결한 후, 다음 Phase부터 재개하시겠습니까?
+```
+
+---
+
+## 🔒 Phase 간 격리 보장
+
+### 격리 원칙
+
+각 에이전트는 **완전히 독립적인 세션**에서 실행됩니다:
+
+**보장 사항**:
+- ✅ 에이전트는 Handoff 문서만 읽음
+- ✅ 이전 Phase의 실행 컨텍스트 접근 불가
+- ✅ Orchestrator만 전체 파이프라인 파악
+- ✅ 문서 기반 인터페이스로 완전한 격리
+
+**금지 사항**:
+- ❌ 다른 에이전트의 실행 컨텍스트 접근
+- ❌ 이전 Phase의 암묵적 컨텍스트 참조
+- ❌ Handoff에 없는 파일 직접 읽기
+- ❌ 다른 에이전트 직접 호출
+
+### Task Tool 사용 시 주의사항
+
+**올바른 사용**:
+```typescript
+<uses Task tool to launch feature-designer agent with:
+  - subagent_type: "feature-designer"
+  - prompt: "당신은 Feature Designer입니다.
+
+             다음 Handoff 문서를 읽고 작업하세요:
+             - 경로: .claude/agent-docs/orchestrator/handoff/phase1.md
+
+             **중요**:
+             - 이전 Phase의 실행 컨텍스트는 접근할 수 없습니다
+             - Handoff 문서에 명시된 입력만 사용하세요
+             - 명시되지 않은 파일은 읽지 마세요
+
+             완료 후:
+             1. 산출물을 지정된 경로에 생성하세요
+             2. 로그 파일을 작성하세요"
+>
+```
+
+**잘못된 사용**:
+```typescript
+// ❌ 이전 Phase 컨텍스트를 전달하는 것
+<uses Task tool with prompt: "이전에 논의한 내용을 바탕으로...">
+
+// ❌ 암묵적 참조
+<uses Task tool with prompt: "아까 본 파일을 사용해서...">
+
+// ❌ 불명확한 지시
+<uses Task tool with prompt: "적절히 판단해서 작업하세요">
+```
+
+### 격리 검증 방법
+
+각 Phase 시작 시 에이전트에게 다음을 확인:
+- [ ] Handoff 문서 경로가 명시되었는가?
+- [ ] 접근 가능한 파일 목록이 Handoff에 있는가?
+- [ ] 이전 컨텍스트 참조가 없는가?
+
+---
+
 ## 🔄 6단계 TDD 파이프라인 실행 가이드
 
 ### 핵심 원칙

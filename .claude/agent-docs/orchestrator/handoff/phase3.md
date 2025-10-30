@@ -1,3 +1,50 @@
+---
+phase: 3
+agent: test-writer
+timestamp: 2025-10-30T22:08:00Z
+status: ready
+previous_phase: 2
+
+inputs:
+  requirement: "반복 일정 수정 기능의 실패하는 테스트 작성 (TDD RED Phase)"
+  context_files:
+    - ./phase0-plan.md
+    - .claude/agent-docs/feature-designer/logs/spec.md
+    - .claude/agent-docs/test-designer/logs/test-strategy.md
+    - /Users/daehyun/Desktop/hh99_fe_7th/front_7th_chapter1-2/src/__tests__/medium.integration.spec.tsx
+
+references:
+  agent_definition: ../../agents/test-writer.md
+  agent_prompt: ../test-writer/prompt.md
+  shared_docs:
+    - ../../docs/folder-tree.md
+    - ../../docs/rule-of-make-good-test.md
+
+output_requirements:
+  path: /Users/daehyun/Desktop/hh99_fe_7th/front_7th_chapter1-2/src/__tests__/integration/task.recurring-edit.spec.tsx
+  required_sections:
+    - Import statements
+    - Setup function
+    - Mock data
+    - Test suites with GWT pattern
+  format: typescript
+  additional:
+    - logs/red-phase-result.md
+
+constraints:
+  - 테스트는 반드시 실패해야 함 (RED Phase)
+  - GWT 패턴 준수
+  - MSW로 API 모킹
+  - 접근성 테스트 포함
+  - 한글 describe/it 사용
+
+validation_criteria:
+  - 모든 테스트가 실패해야 함
+  - 실패 이유가 명확해야 함
+  - 테스트 코드가 올바르게 작성되어야 함
+  - MSW 핸들러가 올바르게 설정되어야 함
+---
+
 # Phase 3 Handoff: RED - Test Writing
 
 ## 에이전트 정보
@@ -14,12 +61,13 @@
 
 ### 입력 산출물
 - [계획 문서](./phase0-plan.md)
-- [기능 설계](../docs/feature-design.md)
-- [테스트 설계](../docs/test-design.md)
+- [기능 설계](.claude/agent-docs/feature-designer/logs/spec.md)
+- [테스트 설계](.claude/agent-docs/test-designer/logs/test-strategy.md)
 - 기존 테스트 참고: `/Users/daehyun/Desktop/hh99_fe_7th/front_7th_chapter1-2/src/__tests__/medium.integration.spec.tsx`
 
 ### 출력 산출물
-`/Users/daehyun/Desktop/hh99_fe_7th/front_7th_chapter1-2/src/__tests__/integration/task.recurring-edit.spec.tsx` 파일 생성
+- `/Users/daehyun/Desktop/hh99_fe_7th/front_7th_chapter1-2/src/__tests__/integration/task.recurring-edit.spec.tsx` 파일 생성
+- `.claude/agent-docs/test-writer/logs/red-phase-result.md` 작성 (테스트 실패 결과 기록)
 
 ---
 
