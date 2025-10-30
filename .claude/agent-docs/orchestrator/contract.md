@@ -627,6 +627,60 @@ git commit -m "Phase-0: 반복 일정 기능 계획 수립
 git tag phase-N-[feature-slug]
 ```
 
+### Git 자동화 실행 (중요!)
+
+**⚠️ Orchestrator의 필수 책임**: 각 Phase 검증 성공 시 **반드시** git 명령을 실행해야 합니다.
+
+**Phase 완료 후 실행할 명령**:
+
+```bash
+# 1. 변경사항 스테이징
+git add .
+
+# 2. Phase 커밋 생성
+git commit -m "$(cat <<'EOF'
+Phase-N: [한글 설명]
+
+- [상세 내용 1]
+- [상세 내용 2]
+- 산출물: [파일 목록]
+EOF
+)"
+
+# 3. Phase 태그 생성
+git tag phase-N-[feature-slug]
+```
+
+**실행 시점**:
+- Phase 검증이 **성공**한 직후
+- 다음 Phase Handoff 문서 생성 **전**
+
+**Bash Tool 사용 예시**:
+
+```typescript
+// Orchestrator 내부 로직
+await validatePhase(N);  // Phase N 검증
+
+if (validationSuccess) {
+  // Git 커밋 실행 (Bash tool 사용)
+  await bash({
+    command: `git add . && git commit -m "Phase-${N}: ${description}" && git tag phase-${N}-${featureSlug}`,
+    description: `Phase ${N} 커밋 및 태그 생성`
+  });
+
+  // 다음 Phase Handoff 생성
+  await createHandoff(N + 1);
+}
+```
+
+**체크리스트**:
+- [ ] Phase 검증 성공 확인
+- [ ] `git add .` 실행
+- [ ] Phase 커밋 생성
+- [ ] Phase 태그 생성
+- [ ] Git log 확인 (커밋이 생성되었는지)
+- [ ] 다음 Phase Handoff 생성
+
 ### 검증 실패 시 롤백
 
 **자동 롤백 프로토콜**:
